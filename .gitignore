@@ -1,0 +1,64 @@
+# Unity generated
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+
+# Visual Studio / MonoDevelop generated
+.vs/
+[Oo]bj/
+[Bb]in/
+[*.suo]
+[*.userprefs]
+*.csproj
+*.pidb
+*.sln
+
+# Build generated
+[Bb]uilds/
+
+# Asset meta data should only be ignored when the corresponding asset is also ignored
+# Uncomment this line if you wish to ignore the meta files
+#*.meta
+
+# Cache directory for Projeny
+ProjenyCache/
+
+# User-specific files
+[Oo]bj/
+[Dd]ebug/
+[Ii]mport/
+[Ll]ibrary/
+[lL]ocal[Cc]ache/
+*.pidb.meta
+
+# Build artifacts
+*.apk
+*.aab
+*.unitypackage
+*.ipk
+*.deb
+*.exe
+*.msi
+*.dmg
+
+# Unity3D generated backup files
+~/.vscode/*
+*.orig
+
+# Windows thumbnail cache files
+Thumbs.db
+
+# 3rd party assets
+Assets/DigitalKonstrukt/
+Assets/iPoly3D/
+Assets/Off Axis Studios/
+Assets/PrototypeGrids/
+Assets/Scalable Grid Prototype Materials/
+Assets/The_Texture_Lab/
+Assets/Thirdparty/
+
+# Log files
+*.log
+
+# C# project config
+*.vsconfig
