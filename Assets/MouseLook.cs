@@ -6,6 +6,7 @@ public class MouseLook : MonoBehaviour
 {
     public float mouseSensitivity = 100f;
     public Transform playerBody;
+    private float xRotation = 0f;
     
     // Start is called before the first frame update
     void Start()
@@ -18,6 +19,11 @@ public class MouseLook : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        
+        xRotation -= mouseY;
+        
+        
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         
         // Here we rotate around the up direction by the mouseX amount
         playerBody.Rotate(Vector3.up * mouseX);
