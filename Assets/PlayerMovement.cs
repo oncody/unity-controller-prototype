@@ -16,15 +16,43 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded;
     
+    private Vector3 previousPosition;
+    private float previousTime;
+
+    private float maxSpeed = 0f;
+    
     // Start is called before the first frame update
     void Start()
     {
-        
+        previousPosition = transform.position;
+        previousTime = Time.time;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Calculate the distance travelled since the last frame
+        Vector3 distanceTravelled = transform.position - previousPosition;
+
+        // Calculate the time elapsed since the last frame
+        float deltaTime = Time.time - previousTime;
+
+        // Calculate the speed as the distance divided by the time
+        float thisSpeed = distanceTravelled.magnitude / deltaTime;
+
+        if (thisSpeed > maxSpeed)
+        {
+            maxSpeed = thisSpeed;
+        }
+
+        // Store the current position and time for the next frame
+        previousPosition = transform.position;
+        previousTime = Time.time;
+
+        Debug.Log("Speed: " + thisSpeed);
+        Debug.Log("maxSpeed: " + maxSpeed);
+        
+        
         // Get the collider component
         Collider collider = GetComponent<Collider>();
 
@@ -32,30 +60,12 @@ public class PlayerMovement : MonoBehaviour
         float bottomPosition = transform.position.y - collider.bounds.extents.y;
         float characterHeight = topPosition - bottomPosition;
 
-        Debug.Log($"topPosition: {topPosition}");
-        Debug.Log($"bottomPosition: {bottomPosition}");
+        // Debug.Log($"topPosition: {topPosition}");
+        // Debug.Log($"bottomPosition: {bottomPosition}");
         Debug.Log($"characterHeight: {characterHeight}");
         
         RaycastHit hit;
-        
-        float sphereRadius = 0.2f;
-        Vector3 spherePosition = new Vector3(transform.position.x, bottomPosition, transform.position.z);
-        
-        Debug.Log($"spherePosition: {spherePosition}");
-        
-        float sphereDistance = controller.radius + sphereRadius;
-        Debug.Log($"sphereDistance: {sphereDistance}");
-        Debug.Log($"sphereRadius: {sphereRadius}");
-        
-        
-        // Set up the ray's parameters
-        // Vector3 rayOrigin = transform.position + Vector3.up * 0.1f; // Set the origin of the ray to the center of the character's position
         float rayDistance = characterHeight / 2.0f + 0.2f; // Set the distance of the ray to be slightly larger than the character's height
-        
-        
-        // isGrounded = Physics.SphereCast(spherePosition, sphereRadius, -Vector3.up, out RaycastHit hitInfo, sphereDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        // isGrounded = Physics.Raycast(spherePosition, Vector3.down, out hit, distance, layerMask);
-        // isGrounded = Physics.Raycast(spherePosition, Vector3.down, out hit, distance, Physics.AllLayers);
         isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance, Physics.AllLayers);
 
         Debug.Log($"isGrounded: {isGrounded}");
