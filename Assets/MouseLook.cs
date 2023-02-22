@@ -19,6 +19,7 @@ public class MouseLook : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
         
+        // Here we rotate around the up direction by the mouseX amount
         playerBody.Rotate(Vector3.up * mouseX);
     }
 }
