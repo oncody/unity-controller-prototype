@@ -90,8 +90,7 @@ namespace ControlProto.Scripts.Player {
             Rotations.RotateLocally(cameraTransform, RotationAxis.XAxis, pitch);
 
             // Rotate the player based on yaw angle
-            transform.eulerAngles = new Vector3(0, yaw, 0);
-            // Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
+            Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
 
             // Calculate movement direction based on input values
             Vector3 relativeMoveDirection = new Vector3(horizontal, 0, vertical);
