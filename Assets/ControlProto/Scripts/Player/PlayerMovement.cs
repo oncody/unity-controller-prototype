@@ -10,15 +10,9 @@ namespace ControlProto.Scripts.Player {
         private ControllerHandler controllerHandler;
         private Vector3 velocity;
         private bool isGrounded;
-        private Vector3 previousPosition;
-        private float previousTime;
-        private float maxRecordedMovementSpeed = 0f;
 
         void Start() {
             controllerHandler = new ControllerHandler();
-
-            previousPosition = transform.position;
-            previousTime = Time.time;
         }
 
         void Update() {
@@ -31,25 +25,6 @@ namespace ControlProto.Scripts.Player {
             // TODO: CODY change this to bind to a collider
             Collider currentCollider = GetComponent<Collider>();
             Bounds bounds = currentCollider.bounds;
-
-            // Calculate the distance travelled since the last frame
-            Vector3 distanceTravelled = currentPosition - previousPosition;
-
-            // Calculate the time elapsed since the last frame
-            float deltaTime = Time.time - previousTime;
-
-            // Calculate the speed as the distance divided by the time
-            float thisSpeed = distanceTravelled.magnitude / deltaTime;
-
-            if (thisSpeed > maxRecordedMovementSpeed) {
-                maxRecordedMovementSpeed = thisSpeed;
-            }
-
-            previousPosition = currentPosition;
-            previousTime = Time.time;
-
-            Debug.Log("Speed: " + thisSpeed);
-            Debug.Log("maxSpeed: " + maxRecordedMovementSpeed);
 
             float topPosition = currentPosition.y + bounds.extents.y;
             float bottomPosition = currentPosition.y - bounds.extents.y;
