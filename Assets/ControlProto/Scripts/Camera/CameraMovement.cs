@@ -1,13 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
 using UnityEngine;
 
 namespace ControlProto.Scripts.Camera {
-    public class MouseLook : MonoBehaviour {
+    public class CameraMovement : MonoBehaviour {
         [SerializeField] private Transform playerBody;
         [SerializeField] private Globals globals;
 

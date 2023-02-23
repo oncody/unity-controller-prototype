@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace ControlProto.Util.Input.Controller {
+﻿namespace ControlProto.Util.Input.Controller {
     public class ControllerHandler {
         public float HorizontalMouseInput() {
             return SmoothValue(ControllerInput.HorizontalMouseInput);

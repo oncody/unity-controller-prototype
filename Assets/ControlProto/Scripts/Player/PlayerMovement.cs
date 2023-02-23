@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {

@@ -1,5 +1,4 @@
 using ControlProto.Util;
-using ControlProto.Util.Input;
 using ControlProto.Util.Input.Keyboard;
 using UnityEngine;
 
