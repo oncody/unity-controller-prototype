@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using UnityEngine;

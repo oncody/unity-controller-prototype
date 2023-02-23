@@ -7,10 +7,9 @@ namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Globals globals;
-        private ControllerHandler controllerHandler;
+        private readonly ControllerHandler controllerHandler = new();
 
         void Start() {
-            controllerHandler = new ControllerHandler();
         }
 
         void Update() {

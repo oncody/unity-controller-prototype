@@ -11,11 +11,10 @@ namespace ControlProto.Scripts.Camera {
         private const float MaxVerticalLookAngle = 90;
         private const float MinVerticalLookAngle = 90;
 
-        private ControllerHandler controllerHandler;
+        private readonly ControllerHandler controllerHandler = new();
         private float horizontalRotation = 0.0f;
 
         void Start() {
-            controllerHandler = new ControllerHandler();
         }
 
         void Update() {

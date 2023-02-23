@@ -23,11 +23,5 @@ namespace ControlProto.Scripts.Global {
         [field: SerializeField]
         [field: Tooltip("This is how strong gravity is in meters per second squared")]
         public float Gravity { get; private set; }
-
-        void Start() {
-        }
-
-        void Update() {
-        }
     }
 }
