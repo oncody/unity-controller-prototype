@@ -15,11 +15,6 @@ namespace ControlProto.Scripts.Player {
         private const float MinVerticalLookAngle = 90;
 
         private readonly ControllerHandler controllerHandler = new();
-        // private float horizontalRotation = 0;
-
-        // private float horizontalMouseMovementValue;
-        // private float verticalMouseMovementValue;
-        // private Vector3 directionToMoveTo;
 
         private float verticalVelocity = 0;
 
@@ -82,7 +77,7 @@ namespace ControlProto.Scripts.Player {
             // Update the yaw and pitch angles based on mouse input
             yaw += mouseX * globals.HorizontalMouseSensitivity;
             pitch -= mouseY * globals.VerticalMouseSensitivity;
-            pitch = Mathf.Clamp(pitch, -90f, 90f);
+            pitch = Mathf.Clamp(pitch, Maths.NegativeValue(MinVerticalLookAngle), Maths.PositiveValue(MaxVerticalLookAngle));
 
             // Rotate the camera based on pitch angle
             Rotations.RotateLocally(cameraTransform, RotationAxis.XAxis, pitch);
