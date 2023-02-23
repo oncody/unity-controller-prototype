@@ -75,9 +75,6 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void UpdateCameraRotation() {
-            // Get input values for movement and rotation
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
 
@@ -92,14 +89,16 @@ namespace ControlProto.Scripts.Player {
             // Rotate the player based on yaw angle
             Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
 
+            // Get input values for movement and rotation
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
+
             // Calculate movement direction based on input values
             Vector3 relativeMoveDirection = new Vector3(horizontal, 0, vertical);
-
             Vector3 globalMoveDirection = transform.TransformDirection(relativeMoveDirection);
-            globalMoveDirection *= globals.DefaultMovementSpeed;
 
             // Apply movement to character controller
-            characterController.Move(globalMoveDirection * Time.deltaTime);
+            characterController.Move(globalMoveDirection * (globals.DefaultMovementSpeed * Time.deltaTime));
 
             // cameraTransform.localRotation = Quaternion.Euler(mouseY, 0, 0);
             // transform.Rotate(Vector3.up * mouseX);
