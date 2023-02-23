@@ -30,8 +30,9 @@ namespace ControlProto.Scripts.Player {
             UpdateGrounded();
             UpdateCameraRotation();
             UpdateVerticalVelocity();
-            Vector3 horizontalMovement = CalculateHorizontalMovement() * (globals.DefaultMovementSpeed);
+            Vector3 horizontalMovement = CalculateHorizontalMovement() * globals.DefaultMovementSpeed;
             Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
+
             Vector3 combinedMovement = horizontalMovement + verticalMovement;
             characterController.Move(combinedMovement * Time.deltaTime);
         }
@@ -46,7 +47,8 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void UpdateGrounded() {
-            // Set the distance of the ray to be slightly larger than the character's height
+            // Start the raycast at the center point of our character
+            // Set the max ray distance to be slightly larger than half of the character's height
             float rayDistance = (characterController.height / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
             grounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
