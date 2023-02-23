@@ -17,6 +17,7 @@ namespace ControlProto.Scripts.Player {
         private readonly ControllerHandler controllerHandler = new();
 
         private float verticalVelocity = 0;
+        private bool grounded;
 
         // Pitch is up and down rotation of an object. Like tilting your head forward and backward
         private float pitch = 0.0f;
@@ -24,19 +25,30 @@ namespace ControlProto.Scripts.Player {
         // Yaw refers to left and right rotation of an object. For example, turning your head and looking left or right
         private float yaw = 0.0f;
 
+
         private void Update() {
+            UpdateGrounded();
             UpdateCameraRotation();
-            Vector3 horizontalMovement = CalculateHorizontalMovement();
-            // UpdateVerticalVelocity();
-            // Vector3 finalVerticalMovement = new Vector3(0, verticalVelocity, 0) * Time.deltaTime;
-            characterController.Move(horizontalMovement * (globals.DefaultMovementSpeed * Time.deltaTime));
+            UpdateVerticalVelocity();
+            Vector3 horizontalMovement = CalculateHorizontalMovement() * (globals.DefaultMovementSpeed * Time.deltaTime);
+            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0) * Time.deltaTime;
+            Vector3 combinedMovement = horizontalMovement + verticalMovement;
+            characterController.Move(combinedMovement);
         }
 
         private void FixedUpdate() {
+            //todo: try moving character . move code here
         }
 
         private void LateUpdate() {
+            // todo: move this out of update and into lateupdate
             // UpdateCameraRotation();
+        }
+
+        private void UpdateGrounded() {
+            // Set the distance of the ray to be slightly larger than the character's height
+            float rayDistance = (characterController.height / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
+            grounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
 
         private void UpdateCameraRotation() {
@@ -59,15 +71,20 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void UpdateVerticalVelocity() {
-            if (Input.GetButtonDown("Jump") && characterController.isGrounded) {
-                verticalVelocity = Mathf.Sqrt(Maths.PositiveValue(globals.JumpHeight) * 2f * Maths.PositiveValue(globals.Gravity));
+            if (characterController.isGrounded) {
+                if (verticalVelocity < 0) {
+                    verticalVelocity = -2f;
+                }
+
+                if (Input.GetButtonDown("Jump") && characterController.isGrounded) {
+                    verticalVelocity = Mathf.Sqrt(Maths.PositiveValue(globals.JumpHeight) * 2f * Maths.PositiveValue(globals.Gravity));
+                }
+            }
+            else {
+                verticalVelocity += Maths.NegativeValue(globals.Gravity) * Time.deltaTime;
             }
 
-            verticalVelocity += Maths.NegativeValue(globals.Gravity) * Time.deltaTime;
-
-            if (characterController.isGrounded && verticalVelocity < 0) {
-                verticalVelocity = -2f;
-            }
+            Debug.Log($"verticalVelocity: {verticalVelocity}");
         }
     }
 }
