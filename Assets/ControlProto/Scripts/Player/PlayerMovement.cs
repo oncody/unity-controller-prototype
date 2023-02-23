@@ -87,10 +87,11 @@ namespace ControlProto.Scripts.Player {
             pitch = Mathf.Clamp(pitch, -90f, 90f);
 
             // Rotate the camera based on pitch angle
-            Rotations.RotateRelativeToParent(cameraTransform, RotationAxis.XAxis, pitch, false);
+            Rotations.RotateLocally(cameraTransform, RotationAxis.XAxis, pitch);
 
             // Rotate the player based on yaw angle
             transform.eulerAngles = new Vector3(0, yaw, 0);
+            // Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
 
             // Calculate movement direction based on input values
             Vector3 relativeMoveDirection = new Vector3(horizontal, 0, vertical);
