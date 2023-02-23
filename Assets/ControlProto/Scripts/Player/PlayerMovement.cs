@@ -28,7 +28,6 @@ namespace ControlProto.Scripts.Player {
 
         private void Update() {
             UpdateGrounded();
-            ApplyMouseRotationsToPlayerAndCamera();
             MovePlayer();
         }
 
@@ -37,8 +36,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void LateUpdate() {
-            // todo: move this out of update and into lateupdate
-            // UpdateCameraRotation();
+            ApplyMouseRotationsToPlayerAndCamera();
         }
 
         private void MovePlayer() {
