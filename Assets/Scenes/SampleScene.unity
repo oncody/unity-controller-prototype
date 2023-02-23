@@ -260,6 +260,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4726796499908092, guid: 886758c00f5412747bef0c21f6f30418, type: 3}
   m_PrefabInstance: {fileID: 269376955}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &601121835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 601121837}
+  - component: {fileID: 601121836}
+  m_Layer: 0
+  m_Name: Global
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &601121836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601121835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 332c03e2ad9e4f045ba5ea66790f948b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <VerticalMouseSensitivity>k__BackingField: 700
+  <HorizontalMouseSensitivity>k__BackingField: 700
+  <GroundCheckDistance>k__BackingField: 0.2
+  <DefaultMovementSpeed>k__BackingField: 12
+  <Gravity>k__BackingField: 9.81
+--- !u!4 &601121837
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601121835}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 43.420883, y: -103.67537, z: 151.31425}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,8 +566,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e9448e276ab7054e891887ba24032ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 700
   playerBody: {fileID: 1554494924}
+  globals: {fileID: 601121836}
 --- !u!1001 &1107770536
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -734,13 +783,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 868504e31de410145b6526ec6cec904c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 0.1
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 2147483647
   controller: {fileID: 1554494923}
-  speed: 12
-  gravity: -9.81
+  globals: {fileID: 601121836}
 --- !u!1001 &1648520087
 PrefabInstance:
   m_ObjectHideFlags: 0
