@@ -292,8 +292,9 @@ MonoBehaviour:
   <VerticalMouseSensitivity>k__BackingField: 1
   <HorizontalMouseSensitivity>k__BackingField: 1
   <GroundCheckDistance>k__BackingField: 0.2
-  <DefaultMovementSpeed>k__BackingField: 12
+  <DefaultMovementSpeed>k__BackingField: 6
   <Gravity>k__BackingField: 9.81
+  <JumpHeight>k__BackingField: 0
   <DebugEnabled>k__BackingField: 1
 --- !u!4 &601121837
 Transform:

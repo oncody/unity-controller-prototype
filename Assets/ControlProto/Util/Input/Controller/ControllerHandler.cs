@@ -26,7 +26,7 @@
         /**
          * Use this to get a key press value. This returns a binary one or the other
          */
-        private float BinaryValue(ControllerInput input) {
+        private float ResponsiveValue(ControllerInput input) {
             return UnityEngine.Input.GetAxis(ControllerInputMapper.GetMapping(input));
         }
     }

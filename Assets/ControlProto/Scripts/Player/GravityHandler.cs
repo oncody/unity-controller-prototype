@@ -16,23 +16,22 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void Update() {
-            GatherInputs();
+            // GatherInputs();
         }
 
         private void GatherInputs() {
             // Set the distance of the ray to be slightly larger than the character's height
-            float rayDistance = (characterController.height / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
-            isGrounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-
-            if (isGrounded && velocity.y < 0) {
-                velocity.y = -2;
-            }
-
-            velocity.y -= Maths.PositiveValue(globals.Gravity) * Time.deltaTime;
-            characterController.Move(velocity * Time.deltaTime);
+            // float rayDistance = (characterController.height / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
+            // isGrounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
 
         private void FixedUpdate() {
+            // if (isGrounded && (velocity.y < 0)) {
+            //     velocity.y = -2f;
+            // }
+            //
+            // velocity.y -= Maths.PositiveValue(globals.Gravity) * Time.deltaTime;
+            // characterController.Move(velocity * Time.deltaTime);
         }
     }
 }
