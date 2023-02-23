@@ -5,8 +5,9 @@ using UnityEngine;
 
 namespace ControlProto.Scripts.Player {
     public class GravityHandler : MonoBehaviour {
-        [SerializeField] private CharacterController characterController;
         [SerializeField] private Globals globals;
+        [SerializeField] private CharacterController characterController;
+
         private bool isGrounded;
         private Vector3 velocity;
 
@@ -28,10 +29,10 @@ namespace ControlProto.Scripts.Player {
             }
 
             velocity.y -= Maths.PositiveValue(globals.Gravity) * Time.deltaTime;
+            characterController.Move(velocity * Time.deltaTime);
         }
 
         private void FixedUpdate() {
-            characterController.Move(velocity * Time.deltaTime);
         }
     }
 }

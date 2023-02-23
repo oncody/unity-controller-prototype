@@ -289,8 +289,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332c03e2ad9e4f045ba5ea66790f948b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <VerticalMouseSensitivity>k__BackingField: 300
-  <HorizontalMouseSensitivity>k__BackingField: 300
+  <VerticalMouseSensitivity>k__BackingField: 1
+  <HorizontalMouseSensitivity>k__BackingField: 1
   <GroundCheckDistance>k__BackingField: 0.2
   <DefaultMovementSpeed>k__BackingField: 12
   <Gravity>k__BackingField: 9.81
@@ -567,8 +567,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e9448e276ab7054e891887ba24032ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTransform: {fileID: 1554494924}
-  globals: {fileID: 601121836}
 --- !u!1001 &1107770536
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -786,8 +784,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 868504e31de410145b6526ec6cec904c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterController: {fileID: 1554494923}
   globals: {fileID: 601121836}
+  characterController: {fileID: 1554494923}
+  cameraTransform: {fileID: 963194228}
 --- !u!114 &1554494928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -813,8 +812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: debdcbbb20ed1634fb7b142d410a8d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterController: {fileID: 1554494923}
   globals: {fileID: 601121836}
+  characterController: {fileID: 1554494923}
 --- !u!1001 &1648520087
 PrefabInstance:
   m_ObjectHideFlags: 0

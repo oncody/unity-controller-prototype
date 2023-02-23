@@ -4,6 +4,7 @@ using UnityEngine;
 namespace ControlProto.Scripts.Player {
     public class SpeedRecorder : MonoBehaviour {
         [SerializeField] private Globals globals;
+
         private Vector3 previousPosition;
         private float previousTime;
         private float maxRecordedSpeed = 0f;

@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace ControlProto.Scripts.Player {
     public class CursorLock : MonoBehaviour {
-        private readonly CursorLocker cursorLocker = new();
         private readonly KeyboardHandler keyboardHandler = new();
+        private readonly CursorLocker cursorLocker = new();
 
         private void Start() {
             cursorLocker.LockCursor();
