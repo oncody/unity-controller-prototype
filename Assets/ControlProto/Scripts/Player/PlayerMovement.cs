@@ -5,10 +5,11 @@ using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {
-        [SerializeField] private CharacterController controller;
+        [SerializeField] private CharacterController characterController;
         [SerializeField] private Globals globals;
         private ControllerHandler controllerHandler;
         private Vector3 velocity;
@@ -28,7 +29,7 @@ namespace ControlProto.Scripts.Player {
             Transform currentTransform = transform;
 
             // Store the current position and time for the next frame
-            Vector3 position = currentTransform.position;
+            Vector3 currentPosition = currentTransform.position;
 
             // Get the collider component
             // TODO: CODY change this to bind to a collider
@@ -36,7 +37,7 @@ namespace ControlProto.Scripts.Player {
             Bounds bounds = currentCollider.bounds;
 
             // Calculate the distance travelled since the last frame
-            Vector3 distanceTravelled = position - previousPosition;
+            Vector3 distanceTravelled = currentPosition - previousPosition;
 
             // Calculate the time elapsed since the last frame
             float deltaTime = Time.time - previousTime;
@@ -48,24 +49,27 @@ namespace ControlProto.Scripts.Player {
                 maxRecordedMovementSpeed = thisSpeed;
             }
 
-            previousPosition = position;
+            previousPosition = currentPosition;
             previousTime = Time.time;
 
             Debug.Log("Speed: " + thisSpeed);
             Debug.Log("maxSpeed: " + maxRecordedMovementSpeed);
 
-            float topPosition = position.y + bounds.extents.y;
-            float bottomPosition = position.y - bounds.extents.y;
+            float topPosition = currentPosition.y + bounds.extents.y;
+            float bottomPosition = currentPosition.y - bounds.extents.y;
             float characterHeight = topPosition - bottomPosition;
 
             // Debug.Log($"topPosition: {topPosition}");
             // Debug.Log($"bottomPosition: {bottomPosition}");
-            Debug.Log($"characterHeight: {characterHeight}");
+            // Debug.Log($"characterHeight: {characterHeight}");
 
             RaycastHit hit;
+
             // Set the distance of the ray to be slightly larger than the character's height
             float rayDistance = (characterHeight / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
-            isGrounded = Physics.Raycast(position, Vector3.down, out hit, rayDistance, Physics.AllLayers);
+            Debug.Log($"rayDistance: {rayDistance}");
+
+            isGrounded = Physics.SphereCast(currentPosition, characterController.radius, Vector3.down, out hit, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 
             Debug.Log($"isGrounded: {isGrounded}");
 
@@ -77,10 +81,10 @@ namespace ControlProto.Scripts.Player {
             float verticalMovementValue = controllerHandler.VerticalMovementInput();
 
             Vector3 directionToMoveTo = currentTransform.right * horizontalMovementValue + currentTransform.forward * verticalMovementValue;
-            controller.Move(directionToMoveTo * (Maths.PositiveValue(globals.DefaultMovementSpeed) * Time.deltaTime));
+            characterController.Move(directionToMoveTo * (Maths.PositiveValue(globals.DefaultMovementSpeed) * Time.deltaTime));
 
             velocity.y -= globals.Gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
+            characterController.Move(velocity * Time.deltaTime);
         }
 
         public bool IsGrounded() {

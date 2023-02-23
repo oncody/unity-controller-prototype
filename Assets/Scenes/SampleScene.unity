@@ -289,8 +289,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332c03e2ad9e4f045ba5ea66790f948b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <VerticalMouseSensitivity>k__BackingField: 700
-  <HorizontalMouseSensitivity>k__BackingField: 700
+  <VerticalMouseSensitivity>k__BackingField: 300
+  <HorizontalMouseSensitivity>k__BackingField: 300
   <GroundCheckDistance>k__BackingField: 0.2
   <DefaultMovementSpeed>k__BackingField: 12
   <Gravity>k__BackingField: 9.81
@@ -783,7 +783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 868504e31de410145b6526ec6cec904c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 1554494923}
+  characterController: {fileID: 1554494923}
   globals: {fileID: 601121836}
 --- !u!1001 &1648520087
 PrefabInstance:
