@@ -813,8 +813,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: debdcbbb20ed1634fb7b142d410a8d39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  globals: {fileID: 601121836}
-  characterController: {fileID: 1554494923}
 --- !u!1001 &1648520087
 PrefabInstance:
   m_ObjectHideFlags: 0

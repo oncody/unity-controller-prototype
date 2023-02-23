@@ -28,13 +28,8 @@ namespace ControlProto.Scripts.Player {
 
         private void Update() {
             UpdateGrounded();
-            UpdateCameraRotation();
-            UpdateVerticalVelocity();
-            Vector3 horizontalMovement = CalculateHorizontalMovement() * globals.DefaultMovementSpeed;
-            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
-
-            Vector3 combinedMovement = horizontalMovement + verticalMovement;
-            characterController.Move(combinedMovement * Time.deltaTime);
+            ApplyMouseRotationsToPlayerAndCamera();
+            MovePlayer();
         }
 
         private void FixedUpdate() {
@@ -46,6 +41,14 @@ namespace ControlProto.Scripts.Player {
             // UpdateCameraRotation();
         }
 
+        private void MovePlayer() {
+            UpdateVerticalVelocity();
+            Vector3 horizontalMovement = CalculateHorizontalMovement() * globals.DefaultMovementSpeed;
+            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
+            Vector3 combinedMovement = horizontalMovement + verticalMovement;
+            characterController.Move(combinedMovement * Time.deltaTime);
+        }
+
         private void UpdateGrounded() {
             // Start the raycast at the center point of our character
             // Set the max ray distance to be slightly larger than half of the character's height
@@ -53,7 +56,7 @@ namespace ControlProto.Scripts.Player {
             grounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
 
-        private void UpdateCameraRotation() {
+        private void ApplyMouseRotationsToPlayerAndCamera() {
             yaw += controllerHandler.HorizontalMouseMovement() * globals.HorizontalMouseSensitivity;
             pitch -= controllerHandler.VerticalMouseMovement() * globals.VerticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, Maths.NegativeValue(MinVerticalLookAngle), Maths.PositiveValue(MaxVerticalLookAngle));
