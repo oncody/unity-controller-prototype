@@ -2,6 +2,7 @@ using System;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
+using ControlProto.Util.Rotation;
 using UnityEngine;
 
 namespace ControlProto.Scripts.Player {
@@ -86,7 +87,7 @@ namespace ControlProto.Scripts.Player {
             pitch = Mathf.Clamp(pitch, -90f, 90f);
 
             // Rotate the camera based on pitch angle
-            cameraTransform.localEulerAngles = new Vector3(pitch, 0, 0);
+            Rotations.RotateRelativeToParent(cameraTransform, RotationAxis.XAxis, pitch, false);
 
             // Rotate the player based on yaw angle
             transform.eulerAngles = new Vector3(0, yaw, 0);
@@ -116,11 +117,11 @@ namespace ControlProto.Scripts.Player {
             // }
         }
 
-        private Vector2 CalculateHorizontalMovement() {
-            float horizontalInput = Input.GetAxis("Horizontal");
-            float verticalInput = Input.GetAxis("Vertical");
-            return new Vector2(horizontalInput, verticalInput).normalized;
-        }
+        // private Vector2 CalculateHorizontalMovement() {
+        // float horizontalInput = Input.GetAxis("Horizontal");
+        // float verticalInput = Input.GetAxis("Vertical");
+        // return new Vector2(horizontalInput, verticalInput).normalized;
+        // }
 
         // private void FixedUpdate() {
         // Calculate the movement direction based on input and the player's rotation
