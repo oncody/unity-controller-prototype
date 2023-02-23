@@ -48,6 +48,7 @@ namespace ControlProto.Scripts.Player {
 
             // characterController.Move(finalHorizontalMovement);
             UpdateCameraRotation();
+            UpdateMovement();
         }
 
         private void FixedUpdate() {
@@ -89,6 +90,12 @@ namespace ControlProto.Scripts.Player {
             // Rotate the player based on yaw angle
             Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
 
+
+            // cameraTransform.localRotation = Quaternion.Euler(mouseY, 0, 0);
+            // transform.Rotate(Vector3.up * mouseX);
+        }
+
+        private void UpdateMovement() {
             // Get input values for movement and rotation
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
@@ -99,9 +106,6 @@ namespace ControlProto.Scripts.Player {
 
             // Apply movement to character controller
             characterController.Move(globalMoveDirection * (globals.DefaultMovementSpeed * Time.deltaTime));
-
-            // cameraTransform.localRotation = Quaternion.Euler(mouseY, 0, 0);
-            // transform.Rotate(Vector3.up * mouseX);
         }
 
         private void UpdateVerticalVelocity() {
