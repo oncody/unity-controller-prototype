@@ -294,6 +294,7 @@ MonoBehaviour:
   <GroundCheckDistance>k__BackingField: 0.2
   <DefaultMovementSpeed>k__BackingField: 12
   <Gravity>k__BackingField: 9.81
+  <DebugEnabled>k__BackingField: 1
 --- !u!4 &601121837
 Transform:
   m_ObjectHideFlags: 0
@@ -566,7 +567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e9448e276ab7054e891887ba24032ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerBody: {fileID: 1554494924}
+  playerTransform: {fileID: 1554494924}
   globals: {fileID: 601121836}
 --- !u!1001 &1107770536
 PrefabInstance:
@@ -799,6 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b058f203a7b2f814883c2a1c52d480b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  globals: {fileID: 601121836}
 --- !u!114 &1554494929
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -23,5 +23,9 @@ namespace ControlProto.Scripts.Global {
         [field: SerializeField]
         [field: Tooltip("This is how strong gravity is in meters per second squared")]
         public float Gravity { get; private set; }
+
+        [field: SerializeField]
+        [field: Tooltip("Whether or not to run the game in debug mode. This enables some logging")]
+        public bool DebugEnabled { get; private set; }
     }
 }

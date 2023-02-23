@@ -7,11 +7,11 @@ namespace ControlProto.Scripts.Player {
         private readonly CursorLocker cursorLocker = new();
         private readonly KeyboardHandler keyboardHandler = new();
 
-        void Start() {
+        private void Start() {
             cursorLocker.LockCursor();
         }
 
-        void Update() {
+        private void Update() {
             if (keyboardHandler.IsActionPressed(KeyboardAction.StopAppFocus)) {
                 cursorLocker.LockCursor();
             }

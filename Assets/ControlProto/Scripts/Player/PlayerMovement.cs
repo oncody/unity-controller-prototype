@@ -1,3 +1,4 @@
+using System;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
@@ -8,13 +9,22 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Globals globals;
         private readonly ControllerHandler controllerHandler = new();
+        private Vector3 directionToMoveTo;
 
-        void Start() {
+        private void Start() {
+            // GatherInputs();
         }
 
-        void Update() {
+        private void Update() {
+            GatherInputs();
+        }
+
+        private void GatherInputs() {
             Transform currentTransform = transform;
-            Vector3 directionToMoveTo = currentTransform.right * controllerHandler.HorizontalMovementInput() + currentTransform.forward * controllerHandler.VerticalMovementInput();
+            directionToMoveTo = currentTransform.right * controllerHandler.HorizontalMovementInput() + currentTransform.forward * controllerHandler.VerticalMovementInput();
+        }
+
+        private void FixedUpdate() {
             characterController.Move(directionToMoveTo * (Maths.PositiveValue(globals.DefaultMovementSpeed) * Time.deltaTime));
         }
     }
