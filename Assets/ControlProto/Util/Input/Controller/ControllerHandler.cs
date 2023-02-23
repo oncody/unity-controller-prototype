@@ -1,19 +1,19 @@
 ﻿namespace ControlProto.Util.Input.Controller {
     public class ControllerHandler {
-        public float HorizontalMouseInput() {
-            return SmoothValue(ControllerInput.HorizontalMouseInput);
+        public float HorizontalMouseMovement() {
+            return SmoothValue(ControllerInput.HorizontalMouseMovement);
         }
 
-        public float VerticalMouseInput() {
-            return SmoothValue(ControllerInput.VerticalMouseInput);
+        public float VerticalMouseMovement() {
+            return SmoothValue(ControllerInput.VerticalMouseMovement);
         }
 
-        public float HorizontalMovementInput() {
-            return SmoothValue(ControllerInput.HorizontalMovement);
+        public float HorizontalKeyboardMovement() {
+            return SmoothValue(ControllerInput.HorizontalKeyboardMovement);
         }
 
-        public float VerticalMovementInput() {
-            return SmoothValue(ControllerInput.VerticalMovement);
+        public float VerticalKeyboardMovement() {
+            return SmoothValue(ControllerInput.VerticalKeyboardMovement);
         }
 
         /**
