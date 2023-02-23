@@ -21,9 +21,18 @@ namespace ControlProto.Scripts.Player {
 
         private void MovePlayer() {
             UpdateVerticalVelocity();
-            Vector3 horizontalMovement = CalculateHorizontalMovement() * globals.DefaultMovementSpeed;
+
+            Vector3 finalHorizontalMovement = Vector3.zero;
+            Vector3 relativeMoveDirection = GetKeyboardMovementAsVector3();
+            if (relativeMoveDirection != Vector3.zero) {
+                // Convert relative move direction to global move direction
+                Vector3 absoluteMoveDirection = transform.TransformDirection(relativeMoveDirection);
+                Vector3 normalizedAbsoluteMoveDirection = absoluteMoveDirection.normalized;
+                finalHorizontalMovement = absoluteMoveDirection * globals.DefaultMovementSpeed;
+            }
+
             Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
-            Vector3 combinedMovement = horizontalMovement + verticalMovement;
+            Vector3 combinedMovement = finalHorizontalMovement + verticalMovement;
             characterController.Move(combinedMovement * Time.deltaTime);
         }
 
@@ -34,11 +43,22 @@ namespace ControlProto.Scripts.Player {
             grounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
         }
 
-        private Vector3 CalculateHorizontalMovement() {
-            Vector3 relativeMoveDirection = new Vector3(controllerHandler.HorizontalKeyboardMovement(), 0, controllerHandler.VerticalKeyboardMovement());
+        private Vector2 GetKeyboardMovementAsVector2() {
+            var horizontalKeyboardMovement = controllerHandler.HorizontalKeyboardMovement();
+            var verticalKeyboardMovement = controllerHandler.VerticalKeyboardMovement();
+            // Debug.Log($"horizontalKeyboardMovement: {horizontalKeyboardMovement}");
+            // Debug.Log($"verticalKeyboardMovement: {verticalKeyboardMovement}");
 
-            // Convert relative move direction to global move direction
-            return transform.TransformDirection(relativeMoveDirection);
+            return new Vector2(horizontalKeyboardMovement, verticalKeyboardMovement);
+        }
+
+        private Vector3 GetKeyboardMovementAsVector3() {
+            var horizontalKeyboardMovement = controllerHandler.HorizontalKeyboardMovement();
+            var verticalKeyboardMovement = controllerHandler.VerticalKeyboardMovement();
+            // Debug.Log($"horizontalKeyboardMovement: {horizontalKeyboardMovement}");
+            // Debug.Log($"verticalKeyboardMovement: {verticalKeyboardMovement}");
+
+            return new Vector3(horizontalKeyboardMovement, 0, verticalKeyboardMovement);
         }
 
         private void UpdateVerticalVelocity() {
@@ -55,7 +75,7 @@ namespace ControlProto.Scripts.Player {
                 verticalVelocity += Maths.NegativeValue(globals.Gravity) * Time.deltaTime;
             }
 
-            Debug.Log($"verticalVelocity: {verticalVelocity}");
+            // Debug.Log($"verticalVelocity: {verticalVelocity}");
         }
     }
 }

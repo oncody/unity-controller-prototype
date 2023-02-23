@@ -35,8 +35,8 @@ namespace ControlProto.Scripts.Player {
             previousPosition = currentPosition;
             previousTime = Time.time;
 
-            Debug.Log("Speed: " + recordedSpeed);
-            Debug.Log("maxSpeed: " + maxRecordedSpeed);
+            // Debug.Log("Speed: " + recordedSpeed);
+            // Debug.Log("maxSpeed: " + maxRecordedSpeed);
         }
     }
 }
