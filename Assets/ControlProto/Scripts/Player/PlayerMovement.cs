@@ -30,10 +30,10 @@ namespace ControlProto.Scripts.Player {
             UpdateGrounded();
             UpdateCameraRotation();
             UpdateVerticalVelocity();
-            Vector3 horizontalMovement = CalculateHorizontalMovement() * (globals.DefaultMovementSpeed * Time.deltaTime);
-            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0) * Time.deltaTime;
+            Vector3 horizontalMovement = CalculateHorizontalMovement() * (globals.DefaultMovementSpeed);
+            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
             Vector3 combinedMovement = horizontalMovement + verticalMovement;
-            characterController.Move(combinedMovement);
+            characterController.Move(combinedMovement * Time.deltaTime);
         }
 
         private void FixedUpdate() {
