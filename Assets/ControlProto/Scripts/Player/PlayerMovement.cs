@@ -40,21 +40,18 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void UpdateCameraRotation() {
-            // Update the yaw and pitch angles based on mouse input
-            // todo: see if i need mousesensitivity here or ifi can do it lower
             yaw += controllerHandler.HorizontalMouseMovement() * globals.HorizontalMouseSensitivity;
             pitch -= controllerHandler.VerticalMouseMovement() * globals.VerticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, Maths.NegativeValue(MinVerticalLookAngle), Maths.PositiveValue(MaxVerticalLookAngle));
 
-            // Rotate the camera based on pitch angle
+            // Rotate camera up and down
             Rotations.RotateLocally(cameraTransform, RotationAxis.XAxis, pitch);
 
-            // Rotate the player based on yaw angle
+            // Rotate player left and right
             Rotations.RotateGlobally(transform, RotationAxis.YAxis, yaw);
         }
 
         private Vector3 CalculateHorizontalMovement() {
-            // Calculate movement direction based on input values
             Vector3 relativeMoveDirection = new Vector3(controllerHandler.HorizontalKeyboardMovement(), 0, controllerHandler.VerticalKeyboardMovement());
 
             // Convert relative move direction to global move direction
