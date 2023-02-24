@@ -2,6 +2,7 @@ using System;
 using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
+using ControlProto.Util.Input.Keyboard;
 using ControlProto.Util.RayCast;
 using ControlProto.Util.Rotation;
 using Unity.VisualScripting;
@@ -13,13 +14,18 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private CharacterController characterController;
 
         private readonly ControllerHandler controllerHandler = new();
+        private readonly KeyboardHandler keyboardHandler = new();
         private GravityController gravityController;
 
-        private float defaultMovementSpeed;
+        private float crouchMovementSpeed;
+        private float walkMovementSpeed;
+        private float sprintMovementSpeed;
         private float groundCheckDistance;
 
         private void Start() {
-            defaultMovementSpeed = Maths.PositiveValue(globals.DefaultMovementSpeed);
+            crouchMovementSpeed = Maths.PositiveValue(globals.CrouchMovementSpeed);
+            walkMovementSpeed = Maths.PositiveValue(globals.WalkMovementSpeed);
+            sprintMovementSpeed = Maths.PositiveValue(globals.SprintMovementSpeed);
             groundCheckDistance = Maths.PositiveValue(globals.GroundCheckDistance);
             gravityController = new GravityController(globals.Gravity, globals.JumpHeight);
         }
@@ -57,7 +63,7 @@ namespace ControlProto.Scripts.Player {
                 moveVector = new Vector3(moveVector.x, 0, moveVector.z);
             }
 
-            if (groundedSphere.EncounteredObject && Input.GetButtonDown("Jump")) {
+            if (groundedSphere.EncounteredObject && keyboardHandler.IsActionPressed(KeyboardAction.Jump)) {
                 gravityController.ApplyJump();
             }
 
@@ -71,7 +77,7 @@ namespace ControlProto.Scripts.Player {
             Vector3 keyboardMovementVector = new Vector3(controllerHandler.HorizontalKeyboardMovement(), 0, controllerHandler.VerticalKeyboardMovement());
             if (keyboardMovementVector != Vector3.zero) {
                 Vector3 worldMoveDirection = transform.TransformDirection(keyboardMovementVector);
-                horizontalMovementVector = worldMoveDirection.normalized * defaultMovementSpeed;
+                horizontalMovementVector = worldMoveDirection.normalized * walkMovementSpeed;
             }
 
             return horizontalMovementVector;

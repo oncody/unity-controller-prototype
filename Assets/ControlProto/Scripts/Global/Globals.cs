@@ -18,7 +18,15 @@ namespace ControlProto.Scripts.Global {
 
         [field: SerializeField]
         [field: Tooltip("This is how fast the player moves in meters per second")]
-        public float DefaultMovementSpeed { get; private set; }
+        public float CrouchMovementSpeed { get; private set; }
+
+        [field: SerializeField]
+        [field: Tooltip("This is how fast the player moves in meters per second")]
+        public float WalkMovementSpeed { get; private set; }
+
+        [field: SerializeField]
+        [field: Tooltip("This is how fast the player moves in meters per second")]
+        public float SprintMovementSpeed { get; private set; }
 
         [field: SerializeField]
         [field: Tooltip("This is how strong gravity is in meters per second squared")]
