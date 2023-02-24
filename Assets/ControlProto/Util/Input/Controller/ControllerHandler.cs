@@ -1,19 +1,19 @@
 ﻿namespace ControlProto.Util.Input.Controller {
     public class ControllerHandler {
         public float HorizontalMouseMovement() {
-            return SmoothValue(ControllerInput.HorizontalMouseMovement);
+            return ResponsiveValue(ControllerInput.HorizontalMouseMovement);
         }
 
         public float VerticalMouseMovement() {
-            return SmoothValue(ControllerInput.VerticalMouseMovement);
+            return ResponsiveValue(ControllerInput.VerticalMouseMovement);
         }
 
         public float HorizontalKeyboardMovement() {
-            return SmoothValue(ControllerInput.HorizontalKeyboardMovement);
+            return ResponsiveValue(ControllerInput.HorizontalKeyboardMovement);
         }
 
         public float VerticalKeyboardMovement() {
-            return SmoothValue(ControllerInput.VerticalKeyboardMovement);
+            return ResponsiveValue(ControllerInput.VerticalKeyboardMovement);
         }
 
         /**
@@ -27,7 +27,7 @@
          * Use this to get a key press value. This returns a binary one or the other
          */
         private float ResponsiveValue(ControllerInput input) {
-            return UnityEngine.Input.GetAxis(ControllerInputMapper.GetMapping(input));
+            return UnityEngine.Input.GetAxisRaw(ControllerInputMapper.GetMapping(input));
         }
     }
 }

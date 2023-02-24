@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ControlProto.Scripts.Global;
@@ -22,9 +23,17 @@ namespace ControlProto.Scripts.Player {
         // Yaw refers to left and right rotation of an object. For example, turning your head and looking left or right
         private float yaw = 0.0f;
 
+        private float horizontalMouseSensitivity;
+        private float verticalMouseSensitivity;
+
+        private void Start() {
+            horizontalMouseSensitivity = globals.HorizontalMouseSensitivity;
+            verticalMouseSensitivity = globals.VerticalMouseSensitivity;
+        }
+
         private void LateUpdate() {
-            yaw += controllerHandler.HorizontalMouseMovement() * globals.HorizontalMouseSensitivity;
-            pitch -= controllerHandler.VerticalMouseMovement() * globals.VerticalMouseSensitivity;
+            yaw += controllerHandler.HorizontalMouseMovement() * horizontalMouseSensitivity;
+            pitch -= controllerHandler.VerticalMouseMovement() * verticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, Maths.NegativeValue(MinPitch), Maths.PositiveValue(MaxPitch));
 
             // Rotate camera up and down

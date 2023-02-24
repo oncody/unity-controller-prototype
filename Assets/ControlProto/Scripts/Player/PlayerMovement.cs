@@ -3,6 +3,7 @@ using ControlProto.Scripts.Global;
 using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
 using ControlProto.Util.Rotation;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace ControlProto.Scripts.Player {
@@ -11,71 +12,79 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private CharacterController characterController;
 
         private readonly ControllerHandler controllerHandler = new();
-        private float verticalVelocity = 0;
-        private bool grounded;
+        private GravityController gravityController;
+
+        private float defaultMovementSpeed;
+        private float groundCheckDistance;
+
+        private void Start() {
+            defaultMovementSpeed = globals.DefaultMovementSpeed;
+            groundCheckDistance = globals.GroundCheckDistance;
+            gravityController = new GravityController(globals.Gravity, globals.JumpHeight);
+        }
 
         private void Update() {
-            UpdateGrounded();
+            UpdateVerticalVelocity();
             MovePlayer();
         }
 
-        private void MovePlayer() {
-            UpdateVerticalVelocity();
+        private void UpdateVerticalVelocity() {
+            // bool groundedSphere = CheckIfGroundedWithSphereCast();
+            bool groundedRay = CheckIfGroundedWithRayCast();
 
-            Vector3 finalHorizontalMovement = Vector3.zero;
-            Vector3 relativeMoveDirection = GetKeyboardMovementAsVector3();
-            if (relativeMoveDirection != Vector3.zero) {
-                // Convert relative move direction to global move direction
-                Vector3 absoluteMoveDirection = transform.TransformDirection(relativeMoveDirection);
-                Vector3 normalizedAbsoluteMoveDirection = absoluteMoveDirection.normalized;
-                finalHorizontalMovement = absoluteMoveDirection * globals.DefaultMovementSpeed;
+            Debug.Log($"groundedRay: {groundedRay}");
+
+            // todo: this value might need to be -2 sometimes to force the player to the ground when they're hovering right above it
+            if (groundedRay && Input.GetButtonDown("Jump")) {
+                gravityController.ApplyJump();
             }
 
-            Vector3 verticalMovement = new Vector3(0, verticalVelocity, 0);
-            Vector3 combinedMovement = finalHorizontalMovement + verticalMovement;
-            characterController.Move(combinedMovement * Time.deltaTime);
+            gravityController.MoveForwardInTime(groundedRay, Time.deltaTime);
         }
 
-        private void UpdateGrounded() {
+        private bool CheckIfGroundedWithSphereCast() {
             // Start the raycast at the center point of our character
             // Set the max ray distance to be slightly larger than half of the character's height
-            float rayDistance = (characterController.height / 2.0f) + Maths.PositiveValue(globals.GroundCheckDistance);
-            grounded = Physics.SphereCast(transform.position, characterController.radius, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            Vector3 sphereOrigin = transform.position;
+            float sphereRadius = characterController.radius;
+            Vector3 sphereDirection = Vector3.down;
+            float sphereMaxDistance = (characterController.height / 2.0f) + Maths.PositiveValue(groundCheckDistance);
+            int layerMask = Physics.AllLayers;
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.Ignore;
+            return Physics.SphereCast(sphereOrigin, sphereRadius, sphereDirection, out _, sphereMaxDistance, layerMask, queryTriggerInteraction);
         }
 
-        private Vector2 GetKeyboardMovementAsVector2() {
-            var horizontalKeyboardMovement = controllerHandler.HorizontalKeyboardMovement();
-            var verticalKeyboardMovement = controllerHandler.VerticalKeyboardMovement();
-            // Debug.Log($"horizontalKeyboardMovement: {horizontalKeyboardMovement}");
-            // Debug.Log($"verticalKeyboardMovement: {verticalKeyboardMovement}");
+        private bool CheckIfGroundedWithRayCast() {
+            // Start the raycast at the center point of our character
+            // Set the max ray distance to be slightly larger than half of the character's height
+            RaycastHit raycastHit;
+            Vector3 rayOrigin = transform.position;
+            Vector3 sphereDirection = Vector3.down;
+            float sphereMaxDistance = (characterController.height / 2.0f) + Maths.PositiveValue(groundCheckDistance);
+            int layerMask = Physics.AllLayers;
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.Ignore;
 
-            return new Vector2(horizontalKeyboardMovement, verticalKeyboardMovement);
+            return Physics.Raycast(rayOrigin, sphereDirection, out raycastHit, sphereMaxDistance, layerMask, queryTriggerInteraction);
         }
 
-        private Vector3 GetKeyboardMovementAsVector3() {
-            var horizontalKeyboardMovement = controllerHandler.HorizontalKeyboardMovement();
-            var verticalKeyboardMovement = controllerHandler.VerticalKeyboardMovement();
-            // Debug.Log($"horizontalKeyboardMovement: {horizontalKeyboardMovement}");
-            // Debug.Log($"verticalKeyboardMovement: {verticalKeyboardMovement}");
+        private void MovePlayer() {
+            Vector3 verticalMovementVector = new Vector3(0, gravityController.GetVelocity(), 0);
+            Vector3 combinedMovementVector = CalculateHorizontalMovementVector() + verticalMovementVector;
 
-            return new Vector3(horizontalKeyboardMovement, 0, verticalKeyboardMovement);
-        }
-
-        private void UpdateVerticalVelocity() {
-            if (characterController.isGrounded) {
-                if (verticalVelocity < 0) {
-                    verticalVelocity = -2f;
-                }
-
-                if (Input.GetButtonDown("Jump") && characterController.isGrounded) {
-                    verticalVelocity = Mathf.Sqrt(Maths.PositiveValue(globals.JumpHeight) * 2f * Maths.PositiveValue(globals.Gravity));
-                }
+            if (combinedMovementVector != Vector3.zero) {
+                characterController.Move(combinedMovementVector * Time.deltaTime);
             }
-            else {
-                verticalVelocity += Maths.NegativeValue(globals.Gravity) * Time.deltaTime;
+        }
+
+        private Vector3 CalculateHorizontalMovementVector() {
+            Vector3 horizontalMovementVector = Vector3.zero;
+            Vector3 keyboardMovementVector = new Vector3(controllerHandler.HorizontalKeyboardMovement(), 0, controllerHandler.VerticalKeyboardMovement());
+            if (keyboardMovementVector != Vector3.zero) {
+                Vector3 worldMoveDirection = transform.TransformDirection(keyboardMovementVector);
+                horizontalMovementVector = worldMoveDirection.normalized * defaultMovementSpeed;
             }
 
-            // Debug.Log($"verticalVelocity: {verticalVelocity}");
+            return horizontalMovementVector;
         }
     }
 }
