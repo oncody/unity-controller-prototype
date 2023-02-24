@@ -2,7 +2,7 @@
 
 namespace ControlProto.Util {
     public class GravityController {
-        private const float resetVelocity = 0f;
+        private const float resetVelocity = -2;
 
         private readonly float gravity;
         private readonly float jumpHeight = 0;

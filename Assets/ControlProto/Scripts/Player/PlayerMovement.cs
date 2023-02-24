@@ -36,11 +36,29 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 VerticalMoveVector() {
+            Vector3 origin = transform.position;
+            Vector3 moveVector = Vector3.zero;
+
             RayCastReturn groundedSphere = CheckIfGroundedWithSphereCast();
             RayCastReturn groundedRay = CheckIfGroundedWithRayCast();
 
             Debug.Log($"groundedRay: {groundedRay.EncounteredObject}");
             Debug.Log($"groundedSphere: {groundedSphere.EncounteredObject}");
+
+            if (groundedSphere.EncounteredObject) {
+                Debug.Log($"origin: {origin}");
+                Debug.Log($"groundedSphere point: {groundedSphere.Hit.point}");
+            }
+
+            // apply move vector from sphere to point
+            if (groundedSphere.EncounteredObject && !groundedRay.EncounteredObject) {
+                // we are near an edge. gently push the person fall off
+                moveVector = origin - groundedSphere.Hit.point;
+
+                // remove vertical from this
+                moveVector = new Vector3(moveVector.x, 0, moveVector.z);
+                Debug.Log($"move vector with horizontal: {moveVector}");
+            }
 
             // todo: this value might need to be -2 sometimes to force the player to the ground when they're hovering right above it
             if (groundedSphere.EncounteredObject && Input.GetButtonDown("Jump")) {
@@ -48,7 +66,9 @@ namespace ControlProto.Scripts.Player {
             }
 
             gravityController.MoveForwardInTime(groundedSphere.EncounteredObject, Time.deltaTime);
-            return gravityController.MoveVector();
+            moveVector += gravityController.MoveVector();
+            Debug.Log($"move vector return : {moveVector}");
+            return moveVector;
         }
 
         private Vector3 HorizontalMovementVector() {
