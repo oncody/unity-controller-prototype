@@ -2,6 +2,7 @@
 
 namespace ControlProto.Util {
     public class GravityController {
+        // this value might need to be -2 sometimes to force the player to the ground when they're hovering right above it
         private const float resetVelocity = -2;
 
         private readonly float gravity;
