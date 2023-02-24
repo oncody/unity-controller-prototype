@@ -8,7 +8,7 @@ namespace ControlProto.Util {
         private readonly float jumpHeight = 0;
 
         // We need to keep track of this because we need to keep accelerating if they're falling because of gravity
-        private float velocity = 0;
+        public float Velocity { get; private set; }
 
         /**
          * Gravity Value is in meters per second square
@@ -16,6 +16,11 @@ namespace ControlProto.Util {
         public GravityController(float gravity, float jumpHeight) {
             this.gravity = Maths.PositiveValue(gravity);
             this.jumpHeight = Maths.PositiveValue(jumpHeight);
+            Velocity = 0;
+        }
+
+        public Vector3 MoveVector() {
+            return new Vector3(0, Velocity, 0);
         }
 
         public void MoveForwardInTime(bool grounded, float deltaTime) {
@@ -28,24 +33,20 @@ namespace ControlProto.Util {
             }
         }
 
-        public float GetVelocity() {
-            return velocity;
-        }
-
         public void ApplyJump() {
-            velocity += CalculateJumpVelocity();
+            Velocity += CalculateJumpVelocity();
         }
 
         private bool IsMoving() {
-            return velocity < 0;
+            return Velocity < 0;
         }
 
         private void ResetVelocity() {
-            velocity = resetVelocity;
+            Velocity = resetVelocity;
         }
 
         private void ApplyGravity(float deltaTime) {
-            velocity -= gravity * deltaTime;
+            Velocity -= gravity * deltaTime;
         }
 
         private float CalculateJumpVelocity() {
