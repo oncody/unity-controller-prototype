@@ -2,5 +2,7 @@
     public enum KeyboardAction {
         StopAppFocus,
         Jump,
+        Crouch,
+        Sprint,
     }
 }

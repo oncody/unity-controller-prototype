@@ -6,14 +6,14 @@ using ControlProto.Util;
 using ControlProto.Util.Input.Controller;
 using ControlProto.Util.Rotation;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ControlProto.Scripts.Player {
     public class PlayerRotater : MonoBehaviour {
         [SerializeField] private Globals globals;
-        [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform cameraTransform;
 
-        private readonly ControllerHandler controllerHandler = new();
+        private ControllerHandler controllerHandler;
         private const float MaxPitch = 90;
         private const float MinPitch = 90;
 
@@ -27,13 +27,17 @@ namespace ControlProto.Scripts.Player {
         private float verticalMouseSensitivity;
 
         private void Start() {
+            Mouse mouse = InputSystem.GetDevice<Mouse>();
+            Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
+
+            controllerHandler = new ControllerHandler(mouse, keyboard);
             horizontalMouseSensitivity = globals.HorizontalMouseSensitivity;
             verticalMouseSensitivity = globals.VerticalMouseSensitivity;
         }
 
         private void LateUpdate() {
-            yaw += controllerHandler.HorizontalMouseMovement() * horizontalMouseSensitivity;
-            pitch -= controllerHandler.VerticalMouseMovement() * verticalMouseSensitivity;
+            yaw += Input.GetAxisRaw("Mouse X") * horizontalMouseSensitivity;
+            pitch -= Input.GetAxisRaw("Mouse Y") * verticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, Maths.NegativeValue(MinPitch), Maths.PositiveValue(MaxPitch));
 
             // Rotate camera up and down

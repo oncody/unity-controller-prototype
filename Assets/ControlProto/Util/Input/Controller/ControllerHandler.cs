@@ -1,33 +1,29 @@
-﻿namespace ControlProto.Util.Input.Controller {
+﻿using UnityEngine.InputSystem;
+
+namespace ControlProto.Util.Input.Controller {
     public class ControllerHandler {
+        private readonly Mouse mouse;
+        private readonly UnityEngine.InputSystem.Keyboard keyboard;
+
+        public ControllerHandler(Mouse mouse, UnityEngine.InputSystem.Keyboard keyboard) {
+            this.mouse = mouse;
+            this.keyboard = keyboard;
+        }
+
         public float HorizontalMouseMovement() {
-            return ResponsiveValue(ControllerInput.HorizontalMouseMovement);
+            return mouse.delta.x.ReadValue();
         }
 
         public float VerticalMouseMovement() {
-            return ResponsiveValue(ControllerInput.VerticalMouseMovement);
+            return mouse.delta.y.ReadValue();
         }
 
         public float HorizontalKeyboardMovement() {
-            return ResponsiveValue(ControllerInput.HorizontalKeyboardMovement);
+            return keyboard.dKey.ReadValue() - keyboard.aKey.ReadValue();
         }
 
         public float VerticalKeyboardMovement() {
-            return ResponsiveValue(ControllerInput.VerticalKeyboardMovement);
-        }
-
-        /**
-         * Use this to get a joystick or mouse value. This returns a range.
-         */
-        private float SmoothValue(ControllerInput input) {
-            return UnityEngine.Input.GetAxis(ControllerInputMapper.GetMapping(input));
-        }
-
-        /**
-         * Use this to get a key press value. This returns a binary one or the other
-         */
-        private float ResponsiveValue(ControllerInput input) {
-            return UnityEngine.Input.GetAxisRaw(ControllerInputMapper.GetMapping(input));
+            return keyboard.wKey.ReadValue() - keyboard.sKey.ReadValue();
         }
     }
 }
