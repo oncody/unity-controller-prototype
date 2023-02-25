@@ -109,7 +109,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            // Debug.Log($"Moving player: {moveVector}");
+            Debug.Log($"Moving player: {moveVector}");
             player.Move(moveVector * Time.deltaTime);
         }
 
