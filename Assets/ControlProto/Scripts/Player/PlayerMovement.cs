@@ -26,11 +26,12 @@ namespace ControlProto.Scripts.Player {
         private float yaw; // left-right rotation around y-axis
         private int groundLayerValue;
         private LayerMask groundLayerMask;
-        private bool isGrounded = false;
         private float playerTopY;
         private float playerBottomY;
         private float halfPlayerHeight;
         private float rayDistance;
+        private bool jumpStarted;
+        private bool jumpLeftGround;
 
         private void Awake() {
             halfPlayerHeight = player.height / 2.0f;
@@ -52,10 +53,12 @@ namespace ControlProto.Scripts.Player {
 
         private void Jump(InputAction.CallbackContext context) {
             Debug.Log("Jump!");
-            PerformGroundCheck();
-            if (isGrounded && Input.GetKeyDown(KeyCode.Space)) {
-                verticalVelocity += jumpVelocity;
+            if (jumpStarted || jumpLeftGround || !PerformGroundCheck()) {
+                return;
             }
+
+            jumpStarted = true;
+            verticalVelocity += jumpVelocity;
         }
 
         private void OnEnable() {
@@ -104,13 +107,23 @@ namespace ControlProto.Scripts.Player {
             }
         }
 
-        private void PerformGroundCheck() {
-            isGrounded = Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+        private bool PerformGroundCheck() {
+            bool isGrounded = Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+            if (jumpStarted && !jumpLeftGround && !isGrounded) {
+                jumpLeftGround = true;
+            }
+
+            if (jumpStarted && jumpLeftGround && isGrounded) {
+                jumpStarted = false;
+                jumpLeftGround = false;
+            }
+
             Debug.Log($"Grounded: {isGrounded}");
+            return isGrounded;
         }
 
         private Vector3 CalculateVerticalMovement() {
-            PerformGroundCheck();
+            bool isGrounded = PerformGroundCheck();
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
             }
