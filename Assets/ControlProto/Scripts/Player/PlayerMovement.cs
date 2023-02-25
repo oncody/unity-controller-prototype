@@ -49,9 +49,6 @@ namespace ControlProto.Scripts.Player {
             jumpAction = new InputAction("Jump", InputActionType.Button, "<Keyboard>/space");
             jumpAction.performed += JumpCallback;
             jumpAction.Enable();
-
-            // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
-            // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
         }
 
         private void Start() {
@@ -112,7 +109,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            // Debug.Log("Moving player");
+            // Debug.Log($"Moving player: {moveVector}");
             player.Move(moveVector * Time.deltaTime);
         }
 

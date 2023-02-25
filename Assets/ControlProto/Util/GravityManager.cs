@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 namespace ControlProto.Util {
     public class GravityManager {
@@ -9,6 +10,8 @@ namespace ControlProto.Util {
         private readonly float floatTolerance;
         private readonly float gravity;
         private readonly float playerRadius;
+        private readonly float playerHeight;
+        private readonly float halfPlayerHeight;
 
         private float verticalVelocity;
         private RaycastHit groundedSphereHit;
@@ -23,6 +26,8 @@ namespace ControlProto.Util {
         private bool finishedFallingVertically = true;
 
         public GravityManager(string groundLayer, float defaultVerticalVelocity, float playerHeight, float jumpHeight, float gravity, float groundCheckDistance, float floatTolerance, float playerRadius) {
+            this.playerHeight = playerHeight;
+            halfPlayerHeight = this.playerHeight / 2.0f;
             this.defaultVerticalVelocity = defaultVerticalVelocity;
             this.gravity = gravity;
             this.floatTolerance = floatTolerance;
@@ -34,6 +39,8 @@ namespace ControlProto.Util {
         }
 
         private void PerformGroundCheck() {
+            // Debug.Log($"rayorigin: {rayOrigin}");
+            // Debug.Log($"ray distance: {rayDistance}");
             bool currentlyGrounded = Physics.SphereCast(playerPosition, playerRadius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
             if (currentlyGrounded != isGrounded) {
                 Debug.Log($"isGrounded: {currentlyGrounded}");
@@ -101,6 +108,7 @@ namespace ControlProto.Util {
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
                 shouldFallBecauseOfGravity = true;
+                // Debug.Log($"Adding gravity: {verticalVelocity}");
             }
 
             return new Vector3(0, verticalVelocity, 0);
