@@ -15,6 +15,7 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private string groundLayer;
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
+        [SerializeField] private float ledgeEdgeHorizontalPushForce;
 
         [SerializeField] private CharacterController player;
         [SerializeField] private Transform playerCamera;
@@ -38,6 +39,7 @@ namespace ControlProto.Scripts.Player {
         private bool isFallingVertically;
         private bool isGrounded;
         private bool shouldFallBecauseOfGravity;
+        private RaycastHit groundedSphereHit;
         private Vector3 previousPosition;
 
         private void Awake() {
@@ -135,7 +137,8 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void PerformGroundCheck() {
-            isGrounded = isFallingVertically ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+            isGrounded = isFallingVertically ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+
             if (jumpStarted && !jumpLeftGround && !isGrounded) {
                 jumpLeftGround = true;
             }
@@ -148,11 +151,28 @@ namespace ControlProto.Scripts.Player {
 
         private Vector3 CalculateVerticalMovement() {
             shouldFallBecauseOfGravity = false;
+            Vector3 moveVector = Vector3.zero;
+
+            if (isGrounded) {
+                // ledge push code
+                // bool rayCastEncounteredObject = Physics.Raycast(transform.position, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                //
+                // // apply move vector from sphere to point
+                // if (!rayCastEncounteredObject) {
+                //     // we are near an edge. gently push the person fall off
+                //     moveVector = transform.position - groundedSphereHit.point;
+                //
+                //     // remove vertical from this
+                //     moveVector = new Vector3(moveVector.x, 0, moveVector.z);
+                //
+                //     moveVector = moveVector.magnitude * ledgeEdgeHorizontalPushForce * moveVector.normalized;
+                // }
+            }
 
             // verticalVelocity < defaultVerticalVelocity ??
             if (isGrounded && !CurrentlyJumping()) {
                 verticalVelocity = defaultVerticalVelocity;
-                return Vector3.zero;
+                return moveVector;
             }
 
             if (!isGrounded) {
@@ -160,7 +180,7 @@ namespace ControlProto.Scripts.Player {
                 shouldFallBecauseOfGravity = true;
             }
 
-            return new Vector3(0, verticalVelocity, 0);
+            return moveVector + new Vector3(0, verticalVelocity, 0);
         }
 
         private Vector3 CalculateHorizontalMovement() {

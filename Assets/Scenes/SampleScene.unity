@@ -934,6 +934,7 @@ MonoBehaviour:
   groundLayer: Ground
   floatTolerance: 0.0001
   defaultVerticalVelocity: -3
+  ledgeEdgeHorizontalPushForce: 5
   player: {fileID: 1940617865}
   playerCamera: {fileID: 963194228}
 --- !u!1 &1975474343
