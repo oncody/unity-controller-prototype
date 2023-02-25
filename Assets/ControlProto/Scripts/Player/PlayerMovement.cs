@@ -14,6 +14,7 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float jumpHeight;
         [SerializeField] private string groundLayer;
         [SerializeField] private float floatTolerance;
+        [SerializeField] private float defaultVerticalVelocity;
 
         [SerializeField] private CharacterController player;
         [SerializeField] private Transform playerCamera;
@@ -41,7 +42,7 @@ namespace ControlProto.Scripts.Player {
 
         private void Awake() {
             halfPlayerHeight = player.height / 2.0f;
-            jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity);
+            jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity) - defaultVerticalVelocity;
             groundLayerValue = LayerMask.NameToLayer(groundLayer);
             groundLayerMask = 1 << groundLayerValue;
             rayDistance = halfPlayerHeight + groundCheckDistance;
@@ -52,6 +53,7 @@ namespace ControlProto.Scripts.Player {
 
             // Register a callback function for the Jump action
             jumpAction.performed += JumpCallback;
+            verticalVelocity = defaultVerticalVelocity;
 
             // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
             // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
@@ -73,7 +75,7 @@ namespace ControlProto.Scripts.Player {
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
-                verticalVelocity = -2;
+                verticalVelocity = defaultVerticalVelocity;
                 verticalMovement = new Vector3(0, verticalVelocity, 0);
             }
 
@@ -128,6 +130,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
+            Debug.Log("Moving player");
             player.Move(moveVector * Time.deltaTime);
         }
 
@@ -144,17 +147,19 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateVerticalMovement() {
-            if (isGrounded && verticalVelocity < 0) {
-                verticalVelocity = 0;
-                shouldFallBecauseOfGravity = false;
-            }
+            shouldFallBecauseOfGravity = false;
 
+            // verticalVelocity < defaultVerticalVelocity ??
             if (isGrounded && !CurrentlyJumping()) {
+                verticalVelocity = defaultVerticalVelocity;
                 return Vector3.zero;
             }
 
-            verticalVelocity -= gravity * Time.deltaTime;
-            shouldFallBecauseOfGravity = true;
+            if (!isGrounded) {
+                verticalVelocity -= gravity * Time.deltaTime;
+                shouldFallBecauseOfGravity = true;
+            }
+
             return new Vector3(0, verticalVelocity, 0);
         }
 
