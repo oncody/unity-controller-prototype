@@ -24,6 +24,21 @@ namespace ControlProto.Scripts.Player {
         private const float MinPitch = -90;
 
         private InputAction jumpAction;
+        // private InputAction movementInputAction;
+
+        // Define the input action map
+        // private PlayerInputActions playerInputActions;
+        // private InputActionMap playerControls;
+
+        // Define the input actions
+        // private InputAction moveAction;
+        private InputAction rotateAction;
+
+        private Vector2 inputMoveVector;
+        // private Vector2 rotationInput;
+
+        // private InputAction movementInputAction;
+
         private float jumpVelocity;
         private float verticalVelocity;
         private float pitch; // up-down rotation around x-axis
@@ -43,19 +58,59 @@ namespace ControlProto.Scripts.Player {
         private Vector3 previousPosition;
 
         private void Awake() {
+            // InputDevice[] devices = InputSystem.devices.ToArray();
+            // foreach (InputDevice device in devices) {
+            //     Debug.Log("Device name: " + device.name);
+            // }
+
+
+            // Initialize the input action map
+            // playerControls = new InputActionMap();
+
+            // Create the move action and bind it to the WASD keys
+            // moveAction = playerControls.AddAction("move");
+            // moveAction.AddBinding("<Keyboard>/w");
+            // moveAction.AddBinding("<Keyboard>/a");
+            // moveAction.AddBinding("<Keyboard>/s");
+            // moveAction.AddBinding("<Keyboard>/d");
+            var actions = new DefaultInputActions();
+            // actions.Player.Look.performed += OnLook;
+            actions.Player.Move.performed += PlayerMovementCallback;
+            actions.Player.Move.canceled += PlayerMovementCallback;
+            actions.Enable();
+
+
+            // moveAction.started += PlayerMovementCallback;
+            // moveAction.started += PlayerMovementCallback;
+            // playerInputActions.Gameplay.Move.canceled += OnMoveInput;
+
+
+            // Create the rotate action and bind it to the mouse delta
+            // rotateAction = playerControls.AddAction("rotate");
+            // rotateAction.AddBinding("<Mouse>/delta");
+
+
             halfPlayerHeight = player.height / 2.0f;
             jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity) - defaultVerticalVelocity;
             groundLayerValue = LayerMask.NameToLayer(groundLayer);
             groundLayerMask = 1 << groundLayerValue;
             rayDistance = halfPlayerHeight + groundCheckDistance;
 
-            // Initialize the Jump action
-            jumpAction = new InputAction("Jump", InputActionType.Button, null, null);
-            jumpAction.AddBinding("<Keyboard>/space");
-
-            // Register a callback function for the Jump action
+            jumpAction = new InputAction("Jump", InputActionType.Button, "<Keyboard>/space");
             jumpAction.performed += JumpCallback;
+            jumpAction.Enable();
+
             verticalVelocity = defaultVerticalVelocity;
+
+            // Initialize movementInputAction with the Input System asset "PlayerMovement" action map "Move" action
+            // movementInputAction = new InputAction("PlayerMovement");
+            // movementInputAction.AddBinding("<Keyboard>/w");
+            // movementInputAction.AddBinding("<Keyboard>/a");
+            // movementInputAction.AddBinding("<Keyboard>/s");
+            // movementInputAction.AddBinding("<Keyboard>/d");
+            // movementInputAction.started += PlayerMovementCallback;
+            // movementInputAction.performed += PlayerMovementCallback;
+            // movementInputAction.Enable();
 
             // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
             // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
@@ -113,10 +168,14 @@ namespace ControlProto.Scripts.Player {
 
         private void OnEnable() {
             jumpAction.Enable();
+            // movementInputAction.Enable();
+            // playerControls.Enable();
         }
 
         private void OnDisable() {
             jumpAction.Disable();
+            // playerControls.Disable();
+            // movementInputAction.Disable();
         }
 
         private void RotatePlayerAndCamera() {
@@ -184,14 +243,24 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateHorizontalMovement() {
-            Vector3 keyboardMovementVector = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            if (keyboardMovementVector == Vector3.zero) {
+            if (inputMoveVector == Vector2.zero) {
                 return Vector3.zero;
             }
 
-            Vector3 worldMoveDirection = transform.TransformDirection(keyboardMovementVector);
+            Vector3 inputMoveVector3 = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
+
+            Vector3 worldMoveDirection = transform.TransformDirection(inputMoveVector3);
             // normalize converts the magnitude to 1 no matter what
             return worldMoveDirection.normalized * MovementSpeed();
+        }
+
+
+        void PlayerMovementCallback(InputAction.CallbackContext context) {
+            Debug.Log("movement key presseed!!");
+            // Get the input vector from the context
+            Debug.Log($"context: {context}");
+
+            inputMoveVector = context.ReadValue<Vector2>();
         }
 
         private float MovementSpeed() {
