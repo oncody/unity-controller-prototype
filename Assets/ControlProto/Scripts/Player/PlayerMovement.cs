@@ -72,7 +72,8 @@ namespace ControlProto.Scripts.Player {
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
-                verticalMovement = new Vector3(0, -2, 0);
+                verticalVelocity = -2;
+                verticalMovement = new Vector3(0, verticalVelocity, 0);
             }
 
             Vector3 moveVector = horizontalMovement + verticalMovement;
@@ -126,7 +127,6 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            Debug.Log("Moving player");
             player.Move(moveVector * Time.deltaTime);
         }
 
