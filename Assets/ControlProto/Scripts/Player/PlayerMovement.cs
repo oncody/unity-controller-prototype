@@ -46,6 +46,8 @@ namespace ControlProto.Scripts.Player {
         private bool shouldFallBecauseOfGravity;
         private RaycastHit groundedSphereHit;
         private Vector3 previousPosition;
+        private bool startedFallingVertically;
+        private bool finishedFallingVertically = true;
 
         private void Awake() {
             defaultInputActions = new DefaultInputActions();
@@ -81,6 +83,16 @@ namespace ControlProto.Scripts.Player {
         private void Update() {
             Vector3 currentPosition = transform.position;
             isFallingVertically = Mathf.Abs(currentPosition.y - previousPosition.y) > floatTolerance && currentPosition.y < previousPosition.y;
+            if (!startedFallingVertically && isFallingVertically) {
+                startedFallingVertically = true;
+                finishedFallingVertically = false;
+            }
+
+            if (startedFallingVertically && !isFallingVertically) {
+                startedFallingVertically = false;
+                finishedFallingVertically = true;
+            }
+
             PerformGroundCheck();
             RotatePlayerAndCamera();
 
@@ -106,12 +118,8 @@ namespace ControlProto.Scripts.Player {
             previousPosition = currentPosition;
         }
 
-        private void LateUpdate() {
-            // RotatePlayerAndCamera();
-        }
-
         private void JumpCallback(InputAction.CallbackContext context) {
-            if (CurrentlyJumping() || isFallingVertically) {
+            if (CurrentlyJumping() || CurrentlyFalling()) {
                 return;
             }
 
@@ -147,12 +155,13 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            Debug.Log("Moving player");
+            // Debug.Log("Moving player");
             player.Move(moveVector * Time.deltaTime);
         }
 
         private void PerformGroundCheck() {
-            isGrounded = isFallingVertically ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+            isGrounded = Physics.SphereCast(transform.position, player.radius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+            Debug.Log($"isGrounded: {isGrounded}");
 
             if (jumpStarted && !jumpLeftGround && !isGrounded) {
                 jumpLeftGround = true;
@@ -168,25 +177,8 @@ namespace ControlProto.Scripts.Player {
             shouldFallBecauseOfGravity = false;
             Vector3 moveVector = Vector3.zero;
 
-            if (isGrounded) {
-                // ledge push code
-                // leads to weird behavbior
-                // bool rayCastEncounteredObject = Physics.Raycast(transform.position, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-                //
-                // // apply move vector from sphere to point
-                // if (!rayCastEncounteredObject) {
-                //     // we are near an edge. gently push the person fall off
-                //     moveVector = transform.position - groundedSphereHit.point;
-                //
-                //     // remove vertical from this
-                //     moveVector = new Vector3(moveVector.x, 0, moveVector.z);
-                //
-                //     moveVector = moveVector.magnitude * ledgeEdgeHorizontalPushForce * moveVector.normalized;
-                // }
-            }
-
             // verticalVelocity < defaultVerticalVelocity ??
-            if (isGrounded && !CurrentlyJumping()) {
+            if (isGrounded && !CurrentlyJumping() && !CurrentlyFalling()) {
                 verticalVelocity = defaultVerticalVelocity;
                 return moveVector;
             }
@@ -238,6 +230,10 @@ namespace ControlProto.Scripts.Player {
 
         private bool CurrentlyJumping() {
             return jumpStarted || jumpLeftGround;
+        }
+
+        private bool CurrentlyFalling() {
+            return startedFallingVertically && !finishedFallingVertically;
         }
     }
 }
