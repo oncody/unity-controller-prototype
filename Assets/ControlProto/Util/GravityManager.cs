@@ -34,8 +34,12 @@ namespace ControlProto.Util {
         }
 
         private void PerformGroundCheck() {
-            isGrounded = Physics.SphereCast(playerPosition, playerRadius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
-            Debug.Log($"isGrounded: {isGrounded}");
+            bool currentlyGrounded = Physics.SphereCast(playerPosition, playerRadius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+            if (currentlyGrounded != isGrounded) {
+                Debug.Log($"isGrounded: {currentlyGrounded}");
+            }
+
+            isGrounded = currentlyGrounded;
 
             if (jumpStarted && !jumpLeftGround && !isGrounded) {
                 jumpLeftGround = true;

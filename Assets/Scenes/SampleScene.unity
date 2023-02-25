@@ -925,7 +925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   verticalMouseSensitivity: 0.05
   horizontalMouseSensitivity: 0.05
-  groundCheckDistance: 0.2
+  groundCheckDistance: 0.01
   crouchMovementSpeed: 3
   walkMovementSpeed: 6
   sprintMovementSpeed: 8
@@ -934,7 +934,6 @@ MonoBehaviour:
   groundLayer: Ground
   floatTolerance: 0.0001
   defaultVerticalVelocity: -3
-  ledgeEdgeHorizontalPushForce: 5
   player: {fileID: 1940617865}
   playerCamera: {fileID: 963194228}
 --- !u!1 &1975474343
