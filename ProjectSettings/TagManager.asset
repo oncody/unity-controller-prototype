@@ -11,32 +11,32 @@ TagManager:
   - 
   - Water
   - UI
+  - 
+  - 
+  - Environment
   - Ground
+  - Interactive
   - 
   - 
   - 
   - 
   - 
+  - GroundCheck
   - 
   - 
   - 
   - 
   - 
+  - Player
+  - Enemy
   - 
   - 
   - 
+  - Projectiles
+  - Particles
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - NoCollision
   m_SortingLayers:
   - name: Default
     uniqueID: 0

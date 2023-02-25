@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {
@@ -11,13 +12,14 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float gravity;
         [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float jumpHeight;
+        [SerializeField] private string groundLayer;
         [SerializeField] private CharacterController player;
         [SerializeField] private Transform playerCamera;
-        [SerializeField] private string groundLayer;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
 
+        private InputAction jumpAction;
         private float jumpVelocity;
         private float verticalVelocity;
         private float pitch; // up-down rotation around x-axis
@@ -25,22 +27,46 @@ namespace ControlProto.Scripts.Player {
         private int groundLayerValue;
         private LayerMask groundLayerMask;
         private bool isGrounded = false;
-        private Collider playerCollider;
-        private Bounds playerColliderBounds;
         private float playerTopY;
         private float playerBottomY;
+        private float halfPlayerHeight;
+        private float rayDistance;
 
-        private void Start() {
+        private void Awake() {
+            halfPlayerHeight = player.height / 2.0f;
             jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity);
             groundLayerValue = LayerMask.NameToLayer(groundLayer);
             groundLayerMask = 1 << groundLayerValue;
-            playerCollider = GetComponent<Collider>();
-            playerCollider.isTrigger = true;
+            rayDistance = halfPlayerHeight + groundCheckDistance;
 
-            playerColliderBounds = playerCollider.bounds;
-            playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
-            playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
+            // Initialize the Jump action
+            jumpAction = new InputAction("Jump", InputActionType.Button, null, null);
+            jumpAction.AddBinding("<Keyboard>/space");
 
+            // Register a callback function for the Jump action
+            jumpAction.performed += Jump;
+
+            // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
+            // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
+        }
+
+        private void Jump(InputAction.CallbackContext context) {
+            Debug.Log("Jump!");
+            PerformGroundCheck();
+            if (isGrounded && Input.GetKeyDown(KeyCode.Space)) {
+                verticalVelocity += jumpVelocity;
+            }
+        }
+
+        private void OnEnable() {
+            jumpAction.Enable();
+        }
+
+        private void OnDisable() {
+            jumpAction.Disable();
+        }
+
+        private void Start() {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
@@ -78,23 +104,13 @@ namespace ControlProto.Scripts.Player {
             }
         }
 
-        private Vector3 CalculateVerticalMovement() {
-            Vector3 verticalMoveVector = Vector3.zero;
-
-            // Start the raycast at the center point of our character along x, y, and z
-            // Set the max ray distance to be slightly larger than half of the character's height
-            float rayDistance = (player.height / 2.0f) + groundCheckDistance;
-
-            // Debug.Log($"Ray origin: {transform.position}");
-            // Debug.Log($"Ray distance: {rayDistance}");
+        private void PerformGroundCheck() {
             isGrounded = Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
-            // Debug.Log($"Grounded: {grounded}");
+            Debug.Log($"Grounded: {isGrounded}");
+        }
 
-            // Input.GetKeyDown checks if a key is pressed down
-            if (isGrounded && Input.GetKeyDown(KeyCode.Space)) {
-                verticalVelocity += jumpVelocity;
-            }
-
+        private Vector3 CalculateVerticalMovement() {
+            PerformGroundCheck();
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
             }
@@ -104,8 +120,7 @@ namespace ControlProto.Scripts.Player {
                 verticalVelocity = defaultVerticalVelocity;
             }
 
-            verticalMoveVector += new Vector3(0, verticalVelocity, 0);
-            return verticalMoveVector;
+            return new Vector3(0, verticalVelocity, 0);
         }
 
         private Vector3 CalculateHorizontalMovement() {
@@ -127,19 +142,5 @@ namespace ControlProto.Scripts.Player {
 
             return Input.GetKey(KeyCode.LeftShift) ? sprintMovementSpeed : walkMovementSpeed;
         }
-
-        // private void OnTriggerEnter2D(Collider2D other) {
-        //     Debug.Log($"Entering on trigger");
-        //     if (other.gameObject.layer == LayerMask.NameToLayer(groundLayer)) {
-        //         isGrounded = true;
-        //     }
-        // }
-        //
-        // private void OnTriggerExit2D(Collider2D other) {
-        //     Debug.Log($"Exiting on trigger");
-        //     if (other.gameObject.layer == LayerMask.NameToLayer(groundLayer)) {
-        //         isGrounded = false;
-        //     }
-        // }
     }
 }
