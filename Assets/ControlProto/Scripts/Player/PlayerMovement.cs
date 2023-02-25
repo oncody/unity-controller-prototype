@@ -25,6 +25,7 @@ namespace ControlProto.Scripts.Player {
 
         private InputAction jumpAction;
         private DefaultInputActions defaultInputActions;
+
         private Vector2 inputMoveVector;
         private Vector2 inputLookVector;
 
@@ -36,7 +37,7 @@ namespace ControlProto.Scripts.Player {
         private float playerBottomY;
 
         private void Awake() {
-            gravityManager = new GravityManager(groundLayer, defaultVerticalVelocity, player.height, jumpHeight, gravity, groundCheckDistance, floatTolerance, player.radius);
+            gravityManager = new GravityManager(groundLayer, defaultVerticalVelocity, jumpHeight, gravity, groundCheckDistance, floatTolerance);
 
             defaultInputActions = new DefaultInputActions();
             defaultInputActions.Player.Move.performed += PlayerMovementCallback;
@@ -62,7 +63,7 @@ namespace ControlProto.Scripts.Player {
             RotatePlayerAndCamera();
 
             Vector3 horizontalMovement = CalculateHorizontalMovement();
-            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement();
+            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(player);
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             // todo: need to make sure this is happening in some way
@@ -82,7 +83,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
-            gravityManager.JumpRequested();
+            gravityManager.JumpRequested(player);
         }
 
         private void OnEnable() {
@@ -119,8 +120,8 @@ namespace ControlProto.Scripts.Player {
             }
 
             Vector3 inputMoveVector3 = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
-
             Vector3 worldMoveDirection = transform.TransformDirection(inputMoveVector3);
+
             // normalize converts the magnitude to 1 no matter what
             return worldMoveDirection.normalized * MovementSpeed();
         }

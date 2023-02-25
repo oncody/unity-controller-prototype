@@ -5,13 +5,10 @@ namespace ControlProto.Util {
     public class GravityManager {
         private readonly float defaultVerticalVelocity;
         private readonly float jumpVelocity;
-        private readonly float rayDistance;
         private readonly LayerMask groundLayerMask;
         private readonly float floatTolerance;
         private readonly float gravity;
-        private readonly float playerRadius;
-        private readonly float playerHeight;
-        private readonly float halfPlayerHeight;
+        private readonly float groundCheckDistance;
 
         private float verticalVelocity;
         private RaycastHit groundedSphereHit;
@@ -25,21 +22,19 @@ namespace ControlProto.Util {
         private bool startedFallingVertically;
         private bool finishedFallingVertically = true;
 
-        public GravityManager(string groundLayer, float defaultVerticalVelocity, float playerHeight, float jumpHeight, float gravity, float groundCheckDistance, float floatTolerance, float playerRadius) {
-            this.playerHeight = playerHeight;
-            halfPlayerHeight = this.playerHeight / 2.0f;
+        public GravityManager(string groundLayer, float defaultVerticalVelocity, float jumpHeight, float gravity, float groundCheckDistance, float floatTolerance) {
             this.defaultVerticalVelocity = defaultVerticalVelocity;
             this.gravity = gravity;
             this.floatTolerance = floatTolerance;
-            verticalVelocity = defaultVerticalVelocity;
+            this.groundCheckDistance = groundCheckDistance;
             jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity) - defaultVerticalVelocity;
             groundLayerMask = 1 << LayerMask.NameToLayer(groundLayer);
-            rayDistance = playerHeight / 2.0f + groundCheckDistance;
-            this.playerRadius = playerRadius;
+            verticalVelocity = defaultVerticalVelocity;
         }
 
-        private void PerformGroundCheck() {
-            bool currentlyGrounded = Physics.SphereCast(playerPosition, playerRadius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+        private void PerformGroundCheck(CharacterController player) {
+            float rayDistance = player.height / 2.0f + groundCheckDistance;
+            bool currentlyGrounded = Physics.SphereCast(playerPosition, player.radius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
             if (currentlyGrounded != isGrounded) {
                 Debug.Log($"isGrounded: {currentlyGrounded}");
             }
@@ -70,12 +65,12 @@ namespace ControlProto.Util {
             playerPosition = currentPosition;
         }
 
-        public void JumpRequested() {
+        public void JumpRequested(CharacterController player) {
             if (CurrentlyJumping() || CurrentlyFalling()) {
                 return;
             }
 
-            PerformGroundCheck();
+            PerformGroundCheck(player);
             if (isGrounded) {
                 jumpStarted = true;
                 jumpLeftGround = false;
@@ -91,8 +86,8 @@ namespace ControlProto.Util {
             return startedFallingVertically && !finishedFallingVertically;
         }
 
-        public Vector3 CalculateVerticalMovement() {
-            PerformGroundCheck();
+        public Vector3 CalculateVerticalMovement(CharacterController player) {
+            PerformGroundCheck(player);
 
             shouldFallBecauseOfGravity = false;
 
