@@ -925,11 +925,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   verticalMouseSensitivity: 0.05
   horizontalMouseSensitivity: 0.05
-  groundCheckDistance: 0.01
+  groundCheckDistance: 0.001
   crouchMovementSpeed: 3
   walkMovementSpeed: 6
   sprintMovementSpeed: 8
-  gravity: 5
+  gravity: 15
   jumpHeight: 1.2
   groundLayer: Ground
   floatTolerance: 0.0001
