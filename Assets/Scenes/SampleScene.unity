@@ -929,7 +929,7 @@ MonoBehaviour:
   crouchMovementSpeed: 3
   walkMovementSpeed: 6
   sprintMovementSpeed: 8
-  gravity: 9.81
+  gravity: 15
   jumpHeight: 1.2
   groundLayer: Ground
   floatTolerance: 0.0001

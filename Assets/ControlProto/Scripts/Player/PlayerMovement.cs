@@ -36,6 +36,7 @@ namespace ControlProto.Scripts.Player {
         private bool jumpLeftGround;
         private bool isFallingVertically;
         private bool isGrounded;
+        private bool shouldFallBecauseOfGravity;
         private Vector3 previousPosition;
 
         private void Awake() {
@@ -143,14 +144,17 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateVerticalMovement() {
-            if (!isGrounded) {
-                verticalVelocity -= gravity * Time.deltaTime;
-            }
-
             if (isGrounded && verticalVelocity < 0) {
                 verticalVelocity = 0;
+                shouldFallBecauseOfGravity = false;
             }
 
+            if (isGrounded && !CurrentlyJumping()) {
+                return Vector3.zero;
+            }
+
+            verticalVelocity -= gravity * Time.deltaTime;
+            shouldFallBecauseOfGravity = true;
             return new Vector3(0, verticalVelocity, 0);
         }
 
