@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,9 +11,10 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float walkMovementSpeed;
         [SerializeField] private float sprintMovementSpeed;
         [SerializeField] private float gravity;
-        [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float jumpHeight;
         [SerializeField] private string groundLayer;
+        [SerializeField] private float floatTolerance;
+
         [SerializeField] private CharacterController player;
         [SerializeField] private Transform playerCamera;
 
@@ -32,7 +34,7 @@ namespace ControlProto.Scripts.Player {
         private float rayDistance;
         private bool jumpStarted;
         private bool jumpLeftGround;
-        private bool isFallingDownward;
+        private bool isFallingVertically;
         private bool isGrounded;
         private Vector3 previousPosition;
 
@@ -62,8 +64,7 @@ namespace ControlProto.Scripts.Player {
 
         private void Update() {
             Vector3 currentPosition = transform.position;
-            isFallingDownward = currentPosition.y < previousPosition.y;
-
+            isFallingVertically = Mathf.Abs(currentPosition.y - previousPosition.y) > floatTolerance && currentPosition.y < previousPosition.y;
             PerformGroundCheck();
 
             Vector3 horizontalMovement = CalculateHorizontalMovement();
@@ -92,13 +93,14 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
-            if (CurrentlyJumping()) {
+            if (CurrentlyJumping() || isFallingVertically) {
                 return;
             }
 
             PerformGroundCheck();
             if (isGrounded) {
                 jumpStarted = true;
+                // jumpLeftGround = false;
                 verticalVelocity += jumpVelocity;
             }
         }
@@ -129,8 +131,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void PerformGroundCheck() {
-            isGrounded = isFallingDownward ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
-
+            isGrounded = isFallingVertically ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
             if (jumpStarted && !jumpLeftGround && !isGrounded) {
                 jumpLeftGround = true;
             }
@@ -142,12 +143,13 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateVerticalMovement() {
+            // verticalVelocity = isGrounded ? 0 : verticalVelocity - gravity * Time.deltaTime;
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
             }
 
-            if (isGrounded && verticalVelocity < defaultVerticalVelocity) {
-                verticalVelocity = defaultVerticalVelocity;
+            if (isGrounded && verticalVelocity < 0) {
+                verticalVelocity = 0;
             }
 
             return new Vector3(0, verticalVelocity, 0);
