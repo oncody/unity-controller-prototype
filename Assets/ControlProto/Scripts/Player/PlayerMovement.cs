@@ -100,7 +100,7 @@ namespace ControlProto.Scripts.Player {
             PerformGroundCheck();
             if (isGrounded) {
                 jumpStarted = true;
-                // jumpLeftGround = false;
+                jumpLeftGround = false;
                 verticalVelocity += jumpVelocity;
             }
         }
@@ -143,7 +143,6 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateVerticalMovement() {
-            // verticalVelocity = isGrounded ? 0 : verticalVelocity - gravity * Time.deltaTime;
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
             }
