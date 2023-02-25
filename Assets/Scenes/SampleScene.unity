@@ -930,7 +930,7 @@ MonoBehaviour:
   walkMovementSpeed: 6
   sprintMovementSpeed: 8
   gravity: 9.81
-  defaultVerticalVelocity: -2
+  defaultVerticalVelocity: 0
   jumpHeight: 1.2
   groundLayer: Ground
   player: {fileID: 1940617865}

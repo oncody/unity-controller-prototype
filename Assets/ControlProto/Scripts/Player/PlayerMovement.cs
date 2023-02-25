@@ -32,6 +32,9 @@ namespace ControlProto.Scripts.Player {
         private float rayDistance;
         private bool jumpStarted;
         private bool jumpLeftGround;
+        private bool isFallingDownward;
+        private bool isGrounded;
+        private Vector3 previousPosition;
 
         private void Awake() {
             halfPlayerHeight = player.height / 2.0f;
@@ -45,20 +48,59 @@ namespace ControlProto.Scripts.Player {
             jumpAction.AddBinding("<Keyboard>/space");
 
             // Register a callback function for the Jump action
-            jumpAction.performed += Jump;
+            jumpAction.performed += JumpCallback;
 
             // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
             // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
         }
 
-        private void Jump(InputAction.CallbackContext context) {
-            Debug.Log("Jump!");
-            if (jumpStarted || jumpLeftGround || !PerformGroundCheck()) {
+        private void Start() {
+            previousPosition = transform.position;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        private void Update() {
+            Vector3 currentPosition = transform.position;
+            isFallingDownward = currentPosition.y < previousPosition.y;
+
+            PerformGroundCheck();
+
+            Vector3 horizontalMovement = CalculateHorizontalMovement();
+            Vector3 verticalMovement = CalculateVerticalMovement();
+
+            // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
+            if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
+                verticalMovement = new Vector3(0, -2, 0);
+            }
+
+            Vector3 moveVector = horizontalMovement + verticalMovement;
+            if (moveVector != Vector3.zero) {
+                MovePlayer(moveVector);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
+            previousPosition = currentPosition;
+        }
+
+        private void LateUpdate() {
+            RotatePlayerAndCamera();
+        }
+
+        private void JumpCallback(InputAction.CallbackContext context) {
+            if (CurrentlyJumping()) {
                 return;
             }
 
-            jumpStarted = true;
-            verticalVelocity += jumpVelocity;
+            PerformGroundCheck();
+            if (isGrounded) {
+                jumpStarted = true;
+                verticalVelocity += jumpVelocity;
+            }
         }
 
         private void OnEnable() {
@@ -67,26 +109,6 @@ namespace ControlProto.Scripts.Player {
 
         private void OnDisable() {
             jumpAction.Disable();
-        }
-
-        private void Start() {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        private void Update() {
-            Vector3 horizontalMovement = CalculateHorizontalMovement();
-            Vector3 verticalMovement = CalculateVerticalMovement();
-            MovePlayer(horizontalMovement + verticalMovement);
-
-            if (Input.GetKeyDown(KeyCode.Escape)) {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-        }
-
-        private void LateUpdate() {
-            RotatePlayerAndCamera();
         }
 
         private void RotatePlayerAndCamera() {
@@ -102,13 +124,13 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            if (moveVector != Vector3.zero) {
-                player.Move(moveVector * Time.deltaTime);
-            }
+            Debug.Log("Moving player");
+            player.Move(moveVector * Time.deltaTime);
         }
 
-        private bool PerformGroundCheck() {
-            bool isGrounded = Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+        private void PerformGroundCheck() {
+            isGrounded = isFallingDownward ? false : Physics.SphereCast(transform.position, player.radius, Vector3.down, out _, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+
             if (jumpStarted && !jumpLeftGround && !isGrounded) {
                 jumpLeftGround = true;
             }
@@ -117,19 +139,14 @@ namespace ControlProto.Scripts.Player {
                 jumpStarted = false;
                 jumpLeftGround = false;
             }
-
-            Debug.Log($"Grounded: {isGrounded}");
-            return isGrounded;
         }
 
         private Vector3 CalculateVerticalMovement() {
-            bool isGrounded = PerformGroundCheck();
             if (!isGrounded) {
                 verticalVelocity -= gravity * Time.deltaTime;
             }
 
-            bool isFalling = verticalVelocity < defaultVerticalVelocity;
-            if (isGrounded && isFalling) {
+            if (isGrounded && verticalVelocity < defaultVerticalVelocity) {
                 verticalVelocity = defaultVerticalVelocity;
             }
 
@@ -154,6 +171,10 @@ namespace ControlProto.Scripts.Player {
             }
 
             return Input.GetKey(KeyCode.LeftShift) ? sprintMovementSpeed : walkMovementSpeed;
+        }
+
+        private bool CurrentlyJumping() {
+            return jumpStarted || jumpLeftGround;
         }
     }
 }
