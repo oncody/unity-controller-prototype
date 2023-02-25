@@ -24,20 +24,10 @@ namespace ControlProto.Scripts.Player {
         private const float MinPitch = -90;
 
         private InputAction jumpAction;
-        // private InputAction movementInputAction;
 
-        // Define the input action map
-        // private PlayerInputActions playerInputActions;
-        // private InputActionMap playerControls;
-
-        // Define the input actions
-        // private InputAction moveAction;
-        private InputAction rotateAction;
-
+        private DefaultInputActions defaultInputActions;
         private Vector2 inputMoveVector;
-        // private Vector2 rotationInput;
-
-        // private InputAction movementInputAction;
+        private Vector2 inputLookVector;
 
         private float jumpVelocity;
         private float verticalVelocity;
@@ -58,37 +48,13 @@ namespace ControlProto.Scripts.Player {
         private Vector3 previousPosition;
 
         private void Awake() {
-            // InputDevice[] devices = InputSystem.devices.ToArray();
-            // foreach (InputDevice device in devices) {
-            //     Debug.Log("Device name: " + device.name);
-            // }
+            defaultInputActions = new DefaultInputActions();
+            defaultInputActions.Player.Move.performed += PlayerMovementCallback;
+            defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
 
-
-            // Initialize the input action map
-            // playerControls = new InputActionMap();
-
-            // Create the move action and bind it to the WASD keys
-            // moveAction = playerControls.AddAction("move");
-            // moveAction.AddBinding("<Keyboard>/w");
-            // moveAction.AddBinding("<Keyboard>/a");
-            // moveAction.AddBinding("<Keyboard>/s");
-            // moveAction.AddBinding("<Keyboard>/d");
-            var actions = new DefaultInputActions();
-            // actions.Player.Look.performed += OnLook;
-            actions.Player.Move.performed += PlayerMovementCallback;
-            actions.Player.Move.canceled += PlayerMovementCallback;
-            actions.Enable();
-
-
-            // moveAction.started += PlayerMovementCallback;
-            // moveAction.started += PlayerMovementCallback;
-            // playerInputActions.Gameplay.Move.canceled += OnMoveInput;
-
-
-            // Create the rotate action and bind it to the mouse delta
-            // rotateAction = playerControls.AddAction("rotate");
-            // rotateAction.AddBinding("<Mouse>/delta");
-
+            defaultInputActions.Player.Look.performed += PlayerLookCallback;
+            defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
+            defaultInputActions.Enable();
 
             halfPlayerHeight = player.height / 2.0f;
             jumpVelocity = Mathf.Sqrt(2f * jumpHeight * gravity) - defaultVerticalVelocity;
@@ -101,16 +67,6 @@ namespace ControlProto.Scripts.Player {
             jumpAction.Enable();
 
             verticalVelocity = defaultVerticalVelocity;
-
-            // Initialize movementInputAction with the Input System asset "PlayerMovement" action map "Move" action
-            // movementInputAction = new InputAction("PlayerMovement");
-            // movementInputAction.AddBinding("<Keyboard>/w");
-            // movementInputAction.AddBinding("<Keyboard>/a");
-            // movementInputAction.AddBinding("<Keyboard>/s");
-            // movementInputAction.AddBinding("<Keyboard>/d");
-            // movementInputAction.started += PlayerMovementCallback;
-            // movementInputAction.performed += PlayerMovementCallback;
-            // movementInputAction.Enable();
 
             // playerTopY = playerColliderBounds.center.y + playerColliderBounds.extents.y;
             // playerBottomY = playerColliderBounds.center.y - playerColliderBounds.extents.y;
@@ -126,6 +82,7 @@ namespace ControlProto.Scripts.Player {
             Vector3 currentPosition = transform.position;
             isFallingVertically = Mathf.Abs(currentPosition.y - previousPosition.y) > floatTolerance && currentPosition.y < previousPosition.y;
             PerformGroundCheck();
+            RotatePlayerAndCamera();
 
             Vector3 horizontalMovement = CalculateHorizontalMovement();
             Vector3 verticalMovement = CalculateVerticalMovement();
@@ -150,7 +107,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void LateUpdate() {
-            RotatePlayerAndCamera();
+            // RotatePlayerAndCamera();
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
@@ -168,19 +125,18 @@ namespace ControlProto.Scripts.Player {
 
         private void OnEnable() {
             jumpAction.Enable();
-            // movementInputAction.Enable();
-            // playerControls.Enable();
+            defaultInputActions.Enable();
         }
 
         private void OnDisable() {
             jumpAction.Disable();
-            // playerControls.Disable();
-            // movementInputAction.Disable();
+            defaultInputActions.Disable();
         }
 
         private void RotatePlayerAndCamera() {
-            yaw += Input.GetAxisRaw("Mouse X") * horizontalMouseSensitivity;
-            pitch -= Input.GetAxisRaw("Mouse Y") * verticalMouseSensitivity;
+            yaw += inputLookVector.x * horizontalMouseSensitivity;
+            pitch -= inputLookVector.y * verticalMouseSensitivity;
+
             pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
 
             // Rotate camera up and down
@@ -214,6 +170,7 @@ namespace ControlProto.Scripts.Player {
 
             if (isGrounded) {
                 // ledge push code
+                // leads to weird behavbior
                 // bool rayCastEncounteredObject = Physics.Raycast(transform.position, Vector3.down, out _, rayDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
                 //
                 // // apply move vector from sphere to point
@@ -254,12 +211,19 @@ namespace ControlProto.Scripts.Player {
             return worldMoveDirection.normalized * MovementSpeed();
         }
 
+        void PlayerLookCallback(InputAction.CallbackContext context) {
+            inputLookVector = context.ReadValue<Vector2>();
+        }
+
+        void PlayerLookCanceledCallback(InputAction.CallbackContext context) {
+            inputLookVector = Vector2.zero;
+        }
+
+        void PlayerMovementCanceledCallback(InputAction.CallbackContext context) {
+            inputMoveVector = Vector2.zero;
+        }
 
         void PlayerMovementCallback(InputAction.CallbackContext context) {
-            Debug.Log("movement key presseed!!");
-            // Get the input vector from the context
-            Debug.Log($"context: {context}");
-
             inputMoveVector = context.ReadValue<Vector2>();
         }
 

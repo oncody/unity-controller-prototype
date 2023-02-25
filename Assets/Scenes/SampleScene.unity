@@ -923,8 +923,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62522d59fccd333429e3c0b383c080d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verticalMouseSensitivity: 1
-  horizontalMouseSensitivity: 1
+  verticalMouseSensitivity: 0.05
+  horizontalMouseSensitivity: 0.05
   groundCheckDistance: 0.2
   crouchMovementSpeed: 3
   walkMovementSpeed: 6
