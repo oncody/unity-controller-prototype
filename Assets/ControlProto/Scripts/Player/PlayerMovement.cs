@@ -2,6 +2,7 @@ using System;
 using ControlProto.Util;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {
@@ -17,8 +18,9 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
 
-        [SerializeField] private CharacterController player;
-        [SerializeField] private Transform playerCamera;
+        [SerializeField] private CharacterController playerController;
+        [SerializeField] private Transform playerTransform;
+        [SerializeField] private Transform playerCameraTransform;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
@@ -55,6 +57,10 @@ namespace ControlProto.Scripts.Player {
         private void Start() {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            // Offset the character mesh so that it is slightly above the character controller
+            playerController.center += new Vector3(0, playerController.skinWidth, 0);
+            // playerTransform.position -= new Vector3(0, playerController.skinWidth, 0);
         }
 
         private void Update() {
@@ -63,7 +69,7 @@ namespace ControlProto.Scripts.Player {
             RotatePlayerAndCamera();
 
             Vector3 horizontalMovement = CalculateHorizontalMovement();
-            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(player, transform);
+            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(playerController, transform);
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             // todo: need to make sure this is happening in some way
@@ -83,7 +89,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
-            gravityManager.JumpRequested(player, transform);
+            gravityManager.JumpRequested(playerController, transform);
         }
 
         private void OnEnable() {
@@ -103,15 +109,15 @@ namespace ControlProto.Scripts.Player {
             pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
 
             // Rotate camera up and down
-            playerCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
+            playerCameraTransform.localRotation = Quaternion.Euler(pitch, 0, 0);
 
             // Rotate player left and right
             transform.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            // Debug.Log($"Moving player: {moveVector}");
-            player.Move(moveVector * Time.deltaTime);
+            Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
+            playerController.Move(moveVector * Time.deltaTime);
         }
 
         private Vector3 CalculateHorizontalMovement() {
