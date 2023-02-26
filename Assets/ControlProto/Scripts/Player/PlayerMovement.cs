@@ -26,8 +26,6 @@ namespace ControlProto.Scripts.Player {
 
         private readonly List<InputAction> inputActions = new();
         private DefaultInputActions defaultInputActions;
-        private InputAction crouchAction;
-        private InputAction sprintAction;
 
         private GroundSpeed groundSpeed = GroundSpeed.Walking;
         private PlayerState playerState = PlayerState.Idle;
@@ -47,6 +45,8 @@ namespace ControlProto.Scripts.Player {
         private bool finishedFallingVertically = true;
 
         private void Awake() {
+            groundSpeedValue = walkMovementSpeed;
+
             defaultInputActions = new DefaultInputActions();
             defaultInputActions.Player.Move.performed += PlayerMovementCallback;
             defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
@@ -54,31 +54,33 @@ namespace ControlProto.Scripts.Player {
             defaultInputActions.Player.Look.performed += PlayerLookCallback;
             defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
 
-            crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
+            InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
             crouchAction.started += CrouchStartedCallback;
             crouchAction.canceled += CrouchCanceledCallback;
             inputActions.Add(crouchAction);
 
-            sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
+            InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
             sprintAction.started += SprintStartedCallback;
             sprintAction.canceled += SprintCanceledCallback;
             inputActions.Add(sprintAction);
+
+            InputAction exitFocusAction = new InputAction("ExitFocus", InputActionType.Button, "<Keyboard>/escape");
+            exitFocusAction.performed += ExitFocusCallback;
+            inputActions.Add(exitFocusAction);
 
             defaultInputActions.Enable();
             foreach (InputAction inputAction in inputActions) {
                 inputAction.Enable();
             }
-
-            groundSpeedValue = walkMovementSpeed;
         }
 
         private void Start() {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            verticalVelocity = defaultVerticalVelocity;
 
             // Offset the character mesh so that it is slightly above the character controller
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
-            verticalVelocity = defaultVerticalVelocity;
         }
 
         private void Update() {
@@ -97,11 +99,11 @@ namespace ControlProto.Scripts.Player {
             if (moveVector != Vector3.zero) {
                 MovePlayer(moveVector);
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.Escape)) {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+        private void ExitFocusCallback(InputAction.CallbackContext context) {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         private void CrouchStartedCallback(InputAction.CallbackContext context) {
