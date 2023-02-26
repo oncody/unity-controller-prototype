@@ -35,78 +35,81 @@ namespace ControlProto.Util {
         private void PerformGroundCheck(CharacterController playerController, Transform playerTransform) {
             // lets use a checkcapsule
             // start it at the bottom of the player
-            Vector3 rayOrigin = CharacterControllers.GetBottom(playerController, playerTransform);
-            Vector3 rayEnd = rayOrigin - new Vector3(0, groundCheckDistance, 0);
-            bool currentlyGrounded = Physics.CheckCapsule(playerPosition, rayEnd, playerController.radius, groundLayerMask, QueryTriggerInteraction.Ignore);
-            if (currentlyGrounded != isGrounded) {
-                Debug.Log($"isGrounded: {currentlyGrounded}");
-            }
+            // Vector3 rayOrigin = CharacterControllers.GetBottom(playerController, playerTransform);
+            // Vector3 rayEnd = rayOrigin - new Vector3(0, groundCheckDistance, 0);
+            // bool currentlyGrounded = Physics.CheckCapsule(playerPosition, rayEnd, playerController.radius, groundLayerMask, QueryTriggerInteraction.Ignore);
+            // if (currentlyGrounded != isGrounded) {
+            // Debug.Log($"isGrounded: {currentlyGrounded}");
+            // }
 
-            isGrounded = currentlyGrounded;
-            if (jumpStarted && !jumpLeftGround && !isGrounded) {
-                jumpLeftGround = true;
-            }
+            // isGrounded = currentlyGrounded;
+            // if (jumpStarted && !jumpLeftGround && !isGrounded) {
+            // jumpLeftGround = true;
+            // }
 
-            if (jumpStarted && jumpLeftGround && isGrounded) {
-                jumpStarted = false;
-                jumpLeftGround = false;
-            }
+            // if (jumpStarted && jumpLeftGround && isGrounded) {
+            // jumpStarted = false;
+            // jumpLeftGround = false;
+            // }
         }
 
         public void UpdatePlayerPosition(Vector3 currentPosition) {
-            isFallingVertically = Mathf.Abs(currentPosition.y - playerPosition.y) > floatTolerance && currentPosition.y < playerPosition.y;
-            if (!startedFallingVertically && isFallingVertically) {
-                startedFallingVertically = true;
-                finishedFallingVertically = false;
-            }
+            // isFallingVertically = Mathf.Abs(currentPosition.y - playerPosition.y) > floatTolerance && currentPosition.y < playerPosition.y;
+            // if (!startedFallingVertically && isFallingVertically) {
+            // startedFallingVertically = true;
+            // finishedFallingVertically = false;
+            // }
 
-            if (startedFallingVertically && !isFallingVertically) {
-                startedFallingVertically = false;
-                finishedFallingVertically = true;
-            }
+            // if (startedFallingVertically && !isFallingVertically) {
+            // startedFallingVertically = false;
+            // finishedFallingVertically = true;
+            // }
 
-            playerPosition = currentPosition;
+            // playerPosition = currentPosition;
         }
 
         public void JumpRequested(CharacterController playerController, Transform playerTransform) {
-            if (CurrentlyJumping() || CurrentlyFalling()) {
-                return;
-            }
-
-            PerformGroundCheck(playerController, playerTransform);
-            if (isGrounded) {
-                jumpStarted = true;
-                jumpLeftGround = false;
-                verticalVelocity += jumpVelocity;
-            }
+            // if (CurrentlyJumping() || CurrentlyFalling()) {
+            //     return;
+            // }
+            //
+            // PerformGroundCheck(playerController, playerTransform);
+            // if (isGrounded) {
+            //     jumpStarted = true;
+            //     jumpLeftGround = false;
+            //     verticalVelocity += jumpVelocity;
+            // }
         }
 
         private bool CurrentlyJumping() {
-            return jumpStarted || jumpLeftGround;
+            // return jumpStarted || jumpLeftGround;
+            return false;
         }
 
         private bool CurrentlyFalling() {
-            return startedFallingVertically && !finishedFallingVertically;
+            // return startedFallingVertically && !finishedFallingVertically;
+            return false;
         }
 
         public Vector3 CalculateVerticalMovement(CharacterController playerController, Transform playerTransform) {
-            PerformGroundCheck(playerController, playerTransform);
-
-            shouldFallBecauseOfGravity = false;
-
-            // verticalVelocity < defaultVerticalVelocity ??
-            if (isGrounded && !CurrentlyJumping() && !CurrentlyFalling()) {
-                verticalVelocity = defaultVerticalVelocity;
-                return Vector3.zero;
-            }
-
-            if (!isGrounded) {
-                verticalVelocity -= gravity * Time.deltaTime;
-                shouldFallBecauseOfGravity = true;
-                // Debug.Log($"Adding gravity: {verticalVelocity}");
-            }
-
-            return new Vector3(0, verticalVelocity, 0);
+            // PerformGroundCheck(playerController, playerTransform);
+            //
+            // shouldFallBecauseOfGravity = false;
+            //
+            // // verticalVelocity < defaultVerticalVelocity ??
+            // if (isGrounded && !CurrentlyJumping() && !CurrentlyFalling()) {
+            //     verticalVelocity = defaultVerticalVelocity;
+            //     return Vector3.zero;
+            // }
+            //
+            // if (!isGrounded) {
+            //     verticalVelocity -= gravity * Time.deltaTime;
+            //     shouldFallBecauseOfGravity = true;
+            //     // Debug.Log($"Adding gravity: {verticalVelocity}");
+            // }
+            //
+            // return new Vector3(0, verticalVelocity, 0);
+            return Vector3.zero;
         }
     }
 }

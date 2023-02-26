@@ -67,9 +67,9 @@ namespace ControlProto.Scripts.Player {
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             // todo: need to make sure this is happening in some way
-            if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
-                verticalMovement = new Vector3(0, defaultVerticalVelocity, 0);
-            }
+            // if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
+            // verticalMovement = new Vector3(0, defaultVerticalVelocity, 0);
+            // }
 
             Vector3 moveVector = horizontalMovement + verticalMovement;
             if (moveVector != Vector3.zero) {
