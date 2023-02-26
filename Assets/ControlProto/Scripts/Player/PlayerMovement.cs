@@ -9,12 +9,10 @@ namespace ControlProto.Scripts.Player {
     public class PlayerMovement : MonoBehaviour {
         [SerializeField] private float verticalMouseSensitivity;
         [SerializeField] private float horizontalMouseSensitivity;
-        [SerializeField] private float groundCheckDistance;
         [SerializeField] private float crouchMovementSpeed;
         [SerializeField] private float walkMovementSpeed;
         [SerializeField] private float sprintMovementSpeed;
         [SerializeField] private float gravity;
-        [SerializeField] private string groundLayer;
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float cameralOffsetFromPlayerCeiling;
@@ -66,19 +64,7 @@ namespace ControlProto.Scripts.Player {
         private void Update() {
             UpdateFallingCheck();
             RotatePlayerAndCamera();
-
-            Vector3 moveVector = CalculateHorizontalMovement();
-            Vector3 verticalMoveVector = CalculateVerticalMovement();
-
-            // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
-            if (moveVector != Vector3.zero && verticalMoveVector == Vector3.zero) {
-                verticalMoveVector = new Vector3(0, defaultVerticalVelocity, 0);
-            }
-
-            moveVector += verticalMoveVector;
-            if (moveVector != Vector3.zero) {
-                MovePlayer(moveVector);
-            }
+            MovePlayer();
         }
 
         private void ExitFocusCallback(InputAction.CallbackContext context) {
@@ -148,9 +134,20 @@ namespace ControlProto.Scripts.Player {
             transform.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
-        private void MovePlayer(Vector3 moveVector) {
-            // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
-            playerController.Move(moveVector * Time.deltaTime);
+        private void MovePlayer() {
+            Vector3 moveVector = CalculateHorizontalMovement();
+            Vector3 verticalMoveVector = CalculateVerticalMovement();
+
+            // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
+            if (moveVector != Vector3.zero && verticalMoveVector == Vector3.zero) {
+                verticalMoveVector = new Vector3(0, defaultVerticalVelocity, 0);
+            }
+
+            moveVector += verticalMoveVector;
+            if (moveVector != Vector3.zero) {
+                // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
+                playerController.Move(moveVector * Time.deltaTime);
+            }
         }
 
         private bool CurrentlyFalling() {
