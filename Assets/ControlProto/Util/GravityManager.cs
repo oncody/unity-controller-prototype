@@ -32,9 +32,12 @@ namespace ControlProto.Util {
             verticalVelocity = defaultVerticalVelocity;
         }
 
-        private void PerformGroundCheck(CharacterController player) {
-            float rayDistance = player.height / 2.0f + groundCheckDistance;
-            bool currentlyGrounded = Physics.SphereCast(playerPosition, player.radius, Vector3.down, out groundedSphereHit, rayDistance, groundLayerMask, QueryTriggerInteraction.Ignore);
+        private void PerformGroundCheck(CharacterController playerController, Transform playerTransform) {
+            // lets use a checkcapsule
+            // start it at the bottom of the player
+            Vector3 rayOrigin = CharacterControllers.GetBottom(playerController, playerTransform);
+            Vector3 rayEnd = rayOrigin - new Vector3(0, groundCheckDistance, 0);
+            bool currentlyGrounded = Physics.CheckCapsule(playerPosition, rayEnd, playerController.radius, groundLayerMask, QueryTriggerInteraction.Ignore);
             if (currentlyGrounded != isGrounded) {
                 Debug.Log($"isGrounded: {currentlyGrounded}");
             }
@@ -65,12 +68,12 @@ namespace ControlProto.Util {
             playerPosition = currentPosition;
         }
 
-        public void JumpRequested(CharacterController player) {
+        public void JumpRequested(CharacterController playerController, Transform playerTransform) {
             if (CurrentlyJumping() || CurrentlyFalling()) {
                 return;
             }
 
-            PerformGroundCheck(player);
+            PerformGroundCheck(playerController, playerTransform);
             if (isGrounded) {
                 jumpStarted = true;
                 jumpLeftGround = false;
@@ -86,8 +89,8 @@ namespace ControlProto.Util {
             return startedFallingVertically && !finishedFallingVertically;
         }
 
-        public Vector3 CalculateVerticalMovement(CharacterController player) {
-            PerformGroundCheck(player);
+        public Vector3 CalculateVerticalMovement(CharacterController playerController, Transform playerTransform) {
+            PerformGroundCheck(playerController, playerTransform);
 
             shouldFallBecauseOfGravity = false;
 

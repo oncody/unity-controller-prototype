@@ -63,7 +63,7 @@ namespace ControlProto.Scripts.Player {
             RotatePlayerAndCamera();
 
             Vector3 horizontalMovement = CalculateHorizontalMovement();
-            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(player);
+            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(player, transform);
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             // todo: need to make sure this is happening in some way
@@ -83,7 +83,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
-            gravityManager.JumpRequested(player);
+            gravityManager.JumpRequested(player, transform);
         }
 
         private void OnEnable() {
@@ -110,7 +110,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            Debug.Log($"Moving player: {moveVector}");
+            // Debug.Log($"Moving player: {moveVector}");
             player.Move(moveVector * Time.deltaTime);
         }
 
