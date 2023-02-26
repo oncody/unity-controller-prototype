@@ -45,12 +45,15 @@ namespace ControlProto.Scripts.Player {
         private bool finishedFallingVertically = true;
 
         private void Awake() {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            verticalVelocity = defaultVerticalVelocity;
             groundSpeedValue = walkMovementSpeed;
 
             defaultInputActions = new DefaultInputActions();
             defaultInputActions.Player.Move.performed += PlayerMovementCallback;
             defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
-
             defaultInputActions.Player.Look.performed += PlayerLookCallback;
             defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
 
@@ -75,10 +78,6 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void Start() {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            verticalVelocity = defaultVerticalVelocity;
-
             // Offset the character mesh so that it is slightly above the character controller
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
         }
