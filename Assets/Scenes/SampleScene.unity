@@ -821,12 +821,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   verticalMouseSensitivity: 0.05
   horizontalMouseSensitivity: 0.05
-  groundCheckDistance: 0.2
   crouchMovementSpeed: 3
   walkMovementSpeed: 6
   sprintMovementSpeed: 8
   gravity: 15
-  groundLayer: Ground
   floatTolerance: 0.0001
   defaultVerticalVelocity: -5
   cameralOffsetFromPlayerCeiling: 0.2

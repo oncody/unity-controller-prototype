@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cinemachine;
 using ControlProto.Util;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -121,11 +122,16 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void CreateCamera() {
-            GameObject newCamera = new GameObject("Camera");
-            playerCamera = newCamera.transform;
+            GameObject cameraObject = new GameObject("CinemachineVirtualCamera");
+            playerCamera = cameraObject.transform;
             playerCamera.SetParent(transform);
-            playerCamera.localPosition = new Vector3(0, (playerController.height / 2f) - cameralOffsetFromPlayerCeiling, 0);
-            newCamera.AddComponent<Camera>();
+            playerCamera.localPosition = new Vector3(0, (playerController.height / 2) - cameralOffsetFromPlayerCeiling, 0);
+            CinemachineVirtualCamera cinemachineCameraComponent = cameraObject.AddComponent<CinemachineVirtualCamera>();
+
+            GameObject cameraBrainObject = new GameObject("CameraBrain");
+            cameraBrainObject.transform.SetParent(transform);
+            Camera cameraComponent = cameraBrainObject.AddComponent<Camera>();
+            CinemachineBrain brainComponent = cameraBrainObject.AddComponent<CinemachineBrain>();
         }
 
         private void RotatePlayerAndCamera() {
