@@ -25,8 +25,13 @@ namespace ControlProto.Scripts.Player {
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
 
-        private InputAction jumpAction;
         private DefaultInputActions defaultInputActions;
+        private InputAction crouchAction;
+        private InputAction sprintAction;
+        private InputAction jumpAction;
+
+        private bool isCrouchButtonHeldDown;
+        private bool isSprintButtonHeldDown;
 
         private Vector2 inputMoveVector;
         private Vector2 inputLookVector;
@@ -52,6 +57,16 @@ namespace ControlProto.Scripts.Player {
             jumpAction = new InputAction("Jump", InputActionType.Button, "<Keyboard>/space");
             jumpAction.performed += JumpCallback;
             jumpAction.Enable();
+
+            crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
+            crouchAction.started += CrouchStartedCallback;
+            crouchAction.canceled += CrouchCanceledCallback;
+            crouchAction.Enable();
+
+            sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
+            sprintAction.started += SprintStartedCallback;
+            sprintAction.canceled += SprintCanceledCallback;
+            sprintAction.Enable();
         }
 
         private void Start() {
@@ -88,6 +103,26 @@ namespace ControlProto.Scripts.Player {
             }
         }
 
+        private void CrouchStartedCallback(InputAction.CallbackContext context) {
+            Debug.Log("crouch started");
+            isCrouchButtonHeldDown = true;
+        }
+
+        private void CrouchCanceledCallback(InputAction.CallbackContext context) {
+            Debug.Log("crouch canceled");
+            isCrouchButtonHeldDown = false;
+        }
+
+        private void SprintStartedCallback(InputAction.CallbackContext context) {
+            Debug.Log("sprint started");
+            isSprintButtonHeldDown = true;
+        }
+
+        private void SprintCanceledCallback(InputAction.CallbackContext context) {
+            Debug.Log("sprint canceled");
+            isSprintButtonHeldDown = false;
+        }
+
         private void JumpCallback(InputAction.CallbackContext context) {
             gravityManager.JumpRequested(playerController, transform);
         }
@@ -95,11 +130,22 @@ namespace ControlProto.Scripts.Player {
         private void OnEnable() {
             jumpAction.Enable();
             defaultInputActions.Enable();
+            crouchAction.Enable();
+            sprintAction.Enable();
         }
 
         private void OnDisable() {
             jumpAction.Disable();
             defaultInputActions.Disable();
+            crouchAction.Disable();
+            sprintAction.Disable();
+        }
+
+        private void OnDestroy() {
+            jumpAction.Dispose();
+            defaultInputActions.Dispose();
+            crouchAction.Dispose();
+            sprintAction.Dispose();
         }
 
         private void RotatePlayerAndCamera() {
@@ -149,12 +195,11 @@ namespace ControlProto.Scripts.Player {
         }
 
         private float MovementSpeed() {
-            // Input.GetKey checks if it's held down
-            if (Input.GetKey(KeyCode.LeftControl)) {
+            if (isCrouchButtonHeldDown) {
                 return crouchMovementSpeed;
             }
 
-            return Input.GetKey(KeyCode.LeftShift) ? sprintMovementSpeed : walkMovementSpeed;
+            return isSprintButtonHeldDown ? sprintMovementSpeed : walkMovementSpeed;
         }
     }
 }
