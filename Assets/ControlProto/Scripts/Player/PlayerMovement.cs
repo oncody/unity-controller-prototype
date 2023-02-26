@@ -18,7 +18,6 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float defaultVerticalVelocity;
 
         [SerializeField] private CharacterController playerController;
-        [SerializeField] private Transform playerTransform;
         [SerializeField] private Transform playerCameraTransform;
 
         private const float MaxPitch = 90;
@@ -27,19 +26,22 @@ namespace ControlProto.Scripts.Player {
         private DefaultInputActions defaultInputActions;
         private InputAction crouchAction;
         private InputAction sprintAction;
+        private GroundSpeed groundSpeed = GroundSpeed.Walking;
+        private PlayerState playerState = PlayerState.Idle;
 
-        private bool isCrouchButtonHeldDown;
-        private bool isSprintButtonHeldDown;
-
+        private Vector3 lastPosition;
         private Vector2 inputMoveVector;
         private Vector2 inputLookVector;
 
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
-
-        private GroundSpeed groundSpeed = GroundSpeed.Walking;
-        private PlayerState playerState = PlayerState.Idle;
         private float groundSpeedValue;
+        private float verticalVelocity;
+
+        private bool isCrouchButtonHeldDown;
+        private bool isSprintButtonHeldDown;
+        private bool startedFallingVertically;
+        private bool finishedFallingVertically = true;
 
         private void Awake() {
             defaultInputActions = new DefaultInputActions();
@@ -69,19 +71,22 @@ namespace ControlProto.Scripts.Player {
 
             // Offset the character mesh so that it is slightly above the character controller
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
+            verticalVelocity = defaultVerticalVelocity;
         }
 
         private void Update() {
+            UpdateFallingCheck();
             RotatePlayerAndCamera();
 
             Vector3 moveVector = CalculateHorizontalMovement();
+            Vector3 verticalMoveVector = CalculateVerticalMovement();
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
-            // todo: need to make sure this is happening in some way
-            if (moveVector != Vector3.zero) {
-                moveVector += new Vector3(0, defaultVerticalVelocity, 0);
+            if (moveVector != Vector3.zero && verticalMoveVector == Vector3.zero) {
+                verticalMoveVector = new Vector3(0, defaultVerticalVelocity, 0);
             }
 
+            moveVector += verticalMoveVector;
             if (moveVector != Vector3.zero) {
                 MovePlayer(moveVector);
             }
@@ -152,6 +157,10 @@ namespace ControlProto.Scripts.Player {
             playerController.Move(moveVector * Time.deltaTime);
         }
 
+        private bool CurrentlyFalling() {
+            return startedFallingVertically && !finishedFallingVertically;
+        }
+
         private Vector3 CalculateHorizontalMovement() {
             if (inputMoveVector == Vector2.zero) {
                 return Vector3.zero;
@@ -162,6 +171,16 @@ namespace ControlProto.Scripts.Player {
 
             // normalize converts the magnitude to 1 no matter what
             return worldMoveDirection.normalized * groundSpeedValue;
+        }
+
+        public Vector3 CalculateVerticalMovement() {
+            if (!CurrentlyFalling()) {
+                verticalVelocity = defaultVerticalVelocity;
+                return Vector3.zero;
+            }
+
+            verticalVelocity -= gravity * Time.deltaTime;
+            return new Vector3(0, verticalVelocity, 0);
         }
 
         void PlayerLookCallback(InputAction.CallbackContext context) {
@@ -193,6 +212,24 @@ namespace ControlProto.Scripts.Player {
                 groundSpeed = GroundSpeed.Walking;
                 groundSpeedValue = walkMovementSpeed;
             }
+        }
+
+        private void UpdateFallingCheck() {
+            float lastYPosition = lastPosition.y;
+            float yPosition = transform.position.y;
+            bool isFallingVertically = (Mathf.Abs(yPosition - lastYPosition) > floatTolerance) && (yPosition < lastYPosition);
+
+            if (isFallingVertically && !startedFallingVertically) {
+                startedFallingVertically = true;
+                finishedFallingVertically = false;
+            }
+
+            if (!isFallingVertically && startedFallingVertically) {
+                startedFallingVertically = false;
+                finishedFallingVertically = true;
+            }
+
+            lastPosition = transform.position;
         }
     }
 }
