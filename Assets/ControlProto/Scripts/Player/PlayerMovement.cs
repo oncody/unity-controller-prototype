@@ -17,9 +17,13 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private string groundLayer;
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
+        [SerializeField] private float cameralOffsetFromPlayerCeiling;
 
-        [SerializeField] private CharacterController playerController;
-        [SerializeField] private Transform playerCameraTransform;
+        // [SerializeField] private CharacterController playerController;
+        private CharacterController playerController;
+
+        // [SerializeField] private Transform playerCameraTransform;
+        private Transform playerCameraTransform;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
@@ -51,35 +55,15 @@ namespace ControlProto.Scripts.Player {
             verticalVelocity = defaultVerticalVelocity;
             groundSpeedValue = walkMovementSpeed;
 
-            defaultInputActions = new DefaultInputActions();
-            defaultInputActions.Player.Move.performed += PlayerMovementCallback;
-            defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
-            defaultInputActions.Player.Look.performed += PlayerLookCallback;
-            defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
-
-            InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
-            crouchAction.started += CrouchStartedCallback;
-            crouchAction.canceled += CrouchCanceledCallback;
-            inputActions.Add(crouchAction);
-
-            InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
-            sprintAction.started += SprintStartedCallback;
-            sprintAction.canceled += SprintCanceledCallback;
-            inputActions.Add(sprintAction);
-
-            InputAction exitFocusAction = new InputAction("ExitFocus", InputActionType.Button, "<Keyboard>/escape");
-            exitFocusAction.performed += ExitFocusCallback;
-            inputActions.Add(exitFocusAction);
-
-            defaultInputActions.Enable();
-            foreach (InputAction inputAction in inputActions) {
-                inputAction.Enable();
-            }
+            BindInput();
         }
 
         private void Start() {
             // Offset the character mesh so that it is slightly above the character controller
+            playerController = gameObject.AddComponent<CharacterController>();
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
+
+            CreateCamera();
         }
 
         private void Update() {
@@ -144,6 +128,14 @@ namespace ControlProto.Scripts.Player {
             foreach (InputAction inputAction in inputActions) {
                 inputAction.Dispose();
             }
+        }
+
+        private void CreateCamera() {
+            GameObject newCamera = new GameObject("Camera");
+            playerCameraTransform = newCamera.transform;
+            playerCameraTransform.SetParent(transform);
+            playerCameraTransform.localPosition = new Vector3(0, (playerController.height / 2f) - cameralOffsetFromPlayerCeiling, 0);
+            newCamera.AddComponent<Camera>();
         }
 
         private void RotatePlayerAndCamera() {
@@ -237,6 +229,33 @@ namespace ControlProto.Scripts.Player {
             }
 
             lastPosition = transform.position;
+        }
+
+        private void BindInput() {
+            defaultInputActions = new DefaultInputActions();
+            defaultInputActions.Player.Move.performed += PlayerMovementCallback;
+            defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
+            defaultInputActions.Player.Look.performed += PlayerLookCallback;
+            defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
+
+            InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
+            crouchAction.started += CrouchStartedCallback;
+            crouchAction.canceled += CrouchCanceledCallback;
+            inputActions.Add(crouchAction);
+
+            InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
+            sprintAction.started += SprintStartedCallback;
+            sprintAction.canceled += SprintCanceledCallback;
+            inputActions.Add(sprintAction);
+
+            InputAction exitFocusAction = new InputAction("ExitFocus", InputActionType.Button, "<Keyboard>/escape");
+            exitFocusAction.performed += ExitFocusCallback;
+            inputActions.Add(exitFocusAction);
+
+            defaultInputActions.Enable();
+            foreach (InputAction inputAction in inputActions) {
+                inputAction.Enable();
+            }
         }
     }
 }
