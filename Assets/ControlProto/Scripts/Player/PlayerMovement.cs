@@ -19,11 +19,8 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float cameralOffsetFromPlayerCeiling;
 
-        // [SerializeField] private CharacterController playerController;
         private CharacterController playerController;
-
-        // [SerializeField] private Transform playerCameraTransform;
-        private Transform playerCameraTransform;
+        private Transform playerCamera;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
@@ -132,9 +129,9 @@ namespace ControlProto.Scripts.Player {
 
         private void CreateCamera() {
             GameObject newCamera = new GameObject("Camera");
-            playerCameraTransform = newCamera.transform;
-            playerCameraTransform.SetParent(transform);
-            playerCameraTransform.localPosition = new Vector3(0, (playerController.height / 2f) - cameralOffsetFromPlayerCeiling, 0);
+            playerCamera = newCamera.transform;
+            playerCamera.SetParent(transform);
+            playerCamera.localPosition = new Vector3(0, (playerController.height / 2f) - cameralOffsetFromPlayerCeiling, 0);
             newCamera.AddComponent<Camera>();
         }
 
@@ -145,7 +142,7 @@ namespace ControlProto.Scripts.Player {
             pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
 
             // Rotate camera up and down
-            playerCameraTransform.localRotation = Quaternion.Euler(pitch, 0, 0);
+            playerCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
 
             // Rotate player left and right
             transform.rotation = Quaternion.Euler(0, yaw, 0);
