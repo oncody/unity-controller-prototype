@@ -43,6 +43,10 @@ namespace ControlProto.Scripts.Player {
         private float playerTopY;
         private float playerBottomY;
 
+        private GroundSpeed groundSpeed = GroundSpeed.Walking;
+        private PlayerState playerState = PlayerState.Idle;
+        private float groundSpeedValue;
+
         private void Awake() {
             gravityManager = new GravityManager(groundLayer, defaultVerticalVelocity, jumpHeight, gravity, groundCheckDistance, floatTolerance);
 
@@ -67,6 +71,8 @@ namespace ControlProto.Scripts.Player {
             sprintAction.started += SprintStartedCallback;
             sprintAction.canceled += SprintCanceledCallback;
             sprintAction.Enable();
+
+            groundSpeedValue = walkMovementSpeed;
         }
 
         private void Start() {
@@ -106,21 +112,25 @@ namespace ControlProto.Scripts.Player {
         private void CrouchStartedCallback(InputAction.CallbackContext context) {
             Debug.Log("crouch started");
             isCrouchButtonHeldDown = true;
+            UpdateGroundSpeed();
         }
 
         private void CrouchCanceledCallback(InputAction.CallbackContext context) {
             Debug.Log("crouch canceled");
             isCrouchButtonHeldDown = false;
+            UpdateGroundSpeed();
         }
 
         private void SprintStartedCallback(InputAction.CallbackContext context) {
             Debug.Log("sprint started");
             isSprintButtonHeldDown = true;
+            UpdateGroundSpeed();
         }
 
         private void SprintCanceledCallback(InputAction.CallbackContext context) {
             Debug.Log("sprint canceled");
             isSprintButtonHeldDown = false;
+            UpdateGroundSpeed();
         }
 
         private void JumpCallback(InputAction.CallbackContext context) {
@@ -175,7 +185,7 @@ namespace ControlProto.Scripts.Player {
             Vector3 worldMoveDirection = transform.TransformDirection(inputMoveVector3);
 
             // normalize converts the magnitude to 1 no matter what
-            return worldMoveDirection.normalized * MovementSpeed();
+            return worldMoveDirection.normalized * groundSpeedValue;
         }
 
         void PlayerLookCallback(InputAction.CallbackContext context) {
@@ -194,12 +204,19 @@ namespace ControlProto.Scripts.Player {
             inputMoveVector = context.ReadValue<Vector2>();
         }
 
-        private float MovementSpeed() {
+        private void UpdateGroundSpeed() {
             if (isCrouchButtonHeldDown) {
-                return crouchMovementSpeed;
+                groundSpeed = GroundSpeed.Crouching;
+                groundSpeedValue = crouchMovementSpeed;
             }
-
-            return isSprintButtonHeldDown ? sprintMovementSpeed : walkMovementSpeed;
+            else if (isSprintButtonHeldDown) {
+                groundSpeed = GroundSpeed.Sprinting;
+                groundSpeedValue = sprintMovementSpeed;
+            }
+            else {
+                groundSpeed = GroundSpeed.Walking;
+                groundSpeedValue = walkMovementSpeed;
+            }
         }
     }
 }
