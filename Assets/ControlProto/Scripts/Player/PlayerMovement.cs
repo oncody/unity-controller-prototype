@@ -13,7 +13,6 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float walkMovementSpeed;
         [SerializeField] private float sprintMovementSpeed;
         [SerializeField] private float gravity;
-        [SerializeField] private float jumpHeight;
         [SerializeField] private string groundLayer;
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
@@ -28,7 +27,6 @@ namespace ControlProto.Scripts.Player {
         private DefaultInputActions defaultInputActions;
         private InputAction crouchAction;
         private InputAction sprintAction;
-        private InputAction jumpAction;
 
         private bool isCrouchButtonHeldDown;
         private bool isSprintButtonHeldDown;
@@ -36,20 +34,14 @@ namespace ControlProto.Scripts.Player {
         private Vector2 inputMoveVector;
         private Vector2 inputLookVector;
 
-        private GravityManager gravityManager;
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
-
-        private float playerTopY;
-        private float playerBottomY;
 
         private GroundSpeed groundSpeed = GroundSpeed.Walking;
         private PlayerState playerState = PlayerState.Idle;
         private float groundSpeedValue;
 
         private void Awake() {
-            gravityManager = new GravityManager(groundLayer, defaultVerticalVelocity, jumpHeight, gravity, groundCheckDistance, floatTolerance);
-
             defaultInputActions = new DefaultInputActions();
             defaultInputActions.Player.Move.performed += PlayerMovementCallback;
             defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
@@ -57,10 +49,6 @@ namespace ControlProto.Scripts.Player {
             defaultInputActions.Player.Look.performed += PlayerLookCallback;
             defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
             defaultInputActions.Enable();
-
-            jumpAction = new InputAction("Jump", InputActionType.Button, "<Keyboard>/space");
-            jumpAction.performed += JumpCallback;
-            jumpAction.Enable();
 
             crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
             crouchAction.started += CrouchStartedCallback;
@@ -81,24 +69,19 @@ namespace ControlProto.Scripts.Player {
 
             // Offset the character mesh so that it is slightly above the character controller
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
-            // playerTransform.position -= new Vector3(0, playerController.skinWidth, 0);
         }
 
         private void Update() {
-            Vector3 currentPosition = transform.position;
-            gravityManager.UpdatePlayerPosition(currentPosition);
             RotatePlayerAndCamera();
 
-            Vector3 horizontalMovement = CalculateHorizontalMovement();
-            Vector3 verticalMovement = gravityManager.CalculateVerticalMovement(playerController, transform);
+            Vector3 moveVector = CalculateHorizontalMovement();
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
             // todo: need to make sure this is happening in some way
-            // if (horizontalMovement != Vector3.zero && verticalMovement == Vector3.zero) {
-            // verticalMovement = new Vector3(0, defaultVerticalVelocity, 0);
-            // }
+            if (moveVector != Vector3.zero) {
+                moveVector += new Vector3(0, defaultVerticalVelocity, 0);
+            }
 
-            Vector3 moveVector = horizontalMovement + verticalMovement;
             if (moveVector != Vector3.zero) {
                 MovePlayer(moveVector);
             }
@@ -133,26 +116,19 @@ namespace ControlProto.Scripts.Player {
             UpdateGroundSpeed();
         }
 
-        private void JumpCallback(InputAction.CallbackContext context) {
-            gravityManager.JumpRequested(playerController, transform);
-        }
-
         private void OnEnable() {
-            jumpAction.Enable();
             defaultInputActions.Enable();
             crouchAction.Enable();
             sprintAction.Enable();
         }
 
         private void OnDisable() {
-            jumpAction.Disable();
             defaultInputActions.Disable();
             crouchAction.Disable();
             sprintAction.Disable();
         }
 
         private void OnDestroy() {
-            jumpAction.Dispose();
             defaultInputActions.Dispose();
             crouchAction.Dispose();
             sprintAction.Dispose();
