@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ControlProto.Util;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,9 +24,11 @@ namespace ControlProto.Scripts.Player {
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
 
+        private readonly List<InputAction> inputActions = new();
         private DefaultInputActions defaultInputActions;
         private InputAction crouchAction;
         private InputAction sprintAction;
+
         private GroundSpeed groundSpeed = GroundSpeed.Walking;
         private PlayerState playerState = PlayerState.Idle;
 
@@ -50,17 +53,21 @@ namespace ControlProto.Scripts.Player {
 
             defaultInputActions.Player.Look.performed += PlayerLookCallback;
             defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
-            defaultInputActions.Enable();
 
             crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
             crouchAction.started += CrouchStartedCallback;
             crouchAction.canceled += CrouchCanceledCallback;
-            crouchAction.Enable();
+            inputActions.Add(crouchAction);
 
             sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
             sprintAction.started += SprintStartedCallback;
             sprintAction.canceled += SprintCanceledCallback;
-            sprintAction.Enable();
+            inputActions.Add(sprintAction);
+
+            defaultInputActions.Enable();
+            foreach (InputAction inputAction in inputActions) {
+                inputAction.Enable();
+            }
 
             groundSpeedValue = walkMovementSpeed;
         }
@@ -98,45 +105,44 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void CrouchStartedCallback(InputAction.CallbackContext context) {
-            Debug.Log("crouch started");
             isCrouchButtonHeldDown = true;
             UpdateGroundSpeed();
         }
 
         private void CrouchCanceledCallback(InputAction.CallbackContext context) {
-            Debug.Log("crouch canceled");
             isCrouchButtonHeldDown = false;
             UpdateGroundSpeed();
         }
 
         private void SprintStartedCallback(InputAction.CallbackContext context) {
-            Debug.Log("sprint started");
             isSprintButtonHeldDown = true;
             UpdateGroundSpeed();
         }
 
         private void SprintCanceledCallback(InputAction.CallbackContext context) {
-            Debug.Log("sprint canceled");
             isSprintButtonHeldDown = false;
             UpdateGroundSpeed();
         }
 
         private void OnEnable() {
             defaultInputActions.Enable();
-            crouchAction.Enable();
-            sprintAction.Enable();
+            foreach (InputAction inputAction in inputActions) {
+                inputAction.Enable();
+            }
         }
 
         private void OnDisable() {
             defaultInputActions.Disable();
-            crouchAction.Disable();
-            sprintAction.Disable();
+            foreach (InputAction inputAction in inputActions) {
+                inputAction.Disable();
+            }
         }
 
         private void OnDestroy() {
             defaultInputActions.Dispose();
-            crouchAction.Dispose();
-            sprintAction.Dispose();
+            foreach (InputAction inputAction in inputActions) {
+                inputAction.Dispose();
+            }
         }
 
         private void RotatePlayerAndCamera() {
@@ -153,7 +159,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer(Vector3 moveVector) {
-            Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
+            // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
             playerController.Move(moveVector * Time.deltaTime);
         }
 
