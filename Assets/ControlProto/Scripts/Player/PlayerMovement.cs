@@ -44,20 +44,15 @@ namespace ControlProto.Scripts.Player {
         private bool finishedFallingVertically = true;
 
         private void Awake() {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-
             verticalVelocity = defaultVerticalVelocity;
             groundSpeedValue = walkMovementSpeed;
 
+            LockCursor();
             BindInput();
         }
 
         private void Start() {
-            // Offset the character mesh so that it is slightly above the character controller
-            playerController = gameObject.AddComponent<CharacterController>();
-            playerController.center += new Vector3(0, playerController.skinWidth, 0);
-
+            CreateController();
             CreateCamera();
         }
 
@@ -111,6 +106,17 @@ namespace ControlProto.Scripts.Player {
             foreach (InputAction inputAction in inputActions) {
                 inputAction.Dispose();
             }
+        }
+
+        private void LockCursor() {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        private void CreateController() {
+            // Offset the character mesh so that it is slightly above the character controller. This prevents the player from floating
+            playerController = gameObject.AddComponent<CharacterController>();
+            playerController.center += new Vector3(0, playerController.skinWidth, 0);
         }
 
         private void CreateCamera() {
