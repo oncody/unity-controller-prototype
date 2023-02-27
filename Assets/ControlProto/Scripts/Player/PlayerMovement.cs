@@ -189,22 +189,6 @@ namespace ControlProto.Scripts.Player {
             return new Vector3(0, verticalVelocity, 0);
         }
 
-        void PlayerLookCallback(InputAction.CallbackContext context) {
-            inputLookVector = context.ReadValue<Vector2>();
-        }
-
-        void PlayerLookCanceledCallback(InputAction.CallbackContext context) {
-            inputLookVector = Vector2.zero;
-        }
-
-        void PlayerMovementCanceledCallback(InputAction.CallbackContext context) {
-            inputMoveVector = Vector2.zero;
-        }
-
-        void PlayerMovementCallback(InputAction.CallbackContext context) {
-            inputMoveVector = context.ReadValue<Vector2>();
-        }
-
         private void UpdateGroundSpeed() {
             if (isCrouchButtonHeldDown) {
                 groundSpeed = GroundSpeed.Crouching;
@@ -240,10 +224,11 @@ namespace ControlProto.Scripts.Player {
 
         private void BindInput() {
             defaultInputActions = new DefaultInputActions();
-            defaultInputActions.Player.Move.performed += PlayerMovementCallback;
-            defaultInputActions.Player.Move.canceled += PlayerMovementCanceledCallback;
-            defaultInputActions.Player.Look.performed += PlayerLookCallback;
-            defaultInputActions.Player.Look.canceled += PlayerLookCanceledCallback;
+            defaultInputActions.Player.Move.performed += context => inputMoveVector = context.ReadValue<Vector2>();
+            defaultInputActions.Player.Move.canceled += _ => inputMoveVector = Vector2.zero;
+
+            defaultInputActions.Player.Look.performed += context => inputLookVector = context.ReadValue<Vector2>();
+            defaultInputActions.Player.Look.canceled += _ => inputLookVector = Vector2.zero;
 
             InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
             crouchAction.started += CrouchStartedCallback;
