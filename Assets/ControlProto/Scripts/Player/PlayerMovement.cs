@@ -19,6 +19,7 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float cameralOffsetFromPlayerCeiling;
 
+        private GravityManager gravityManager;
         private CharacterController playerController;
         private Transform playerCamera;
 
@@ -31,24 +32,19 @@ namespace ControlProto.Scripts.Player {
         private GroundSpeed groundSpeed = GroundSpeed.Walking;
         private PlayerState playerState = PlayerState.Idle;
 
-        private Vector3 lastPosition;
         private Vector2 inputMoveVector;
         private Vector2 inputLookVector;
 
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
         private float groundSpeedValue;
-        private float verticalVelocity;
 
         private bool isCrouchButtonHeldDown;
         private bool isSprintButtonHeldDown;
-        private bool startedFallingVertically;
-        private bool finishedFallingVertically = true;
 
         private void Awake() {
-            verticalVelocity = defaultVerticalVelocity;
             groundSpeedValue = walkMovementSpeed;
-
+            gravityManager = new GravityManager(gravity, floatTolerance, defaultVerticalVelocity, transform.position.y);
             LockCursor();
             BindInput();
         }
@@ -59,7 +55,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void Update() {
-            UpdateFallingCheck();
+            gravityManager.UpdateFallingCheck(transform.position.y);
             RotatePlayerAndCamera();
             MovePlayer();
         }
@@ -137,7 +133,6 @@ namespace ControlProto.Scripts.Player {
         private void RotatePlayerAndCamera() {
             yaw += inputLookVector.x * horizontalMouseSensitivity;
             pitch -= inputLookVector.y * verticalMouseSensitivity;
-
             pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
 
             // Rotate camera up and down
@@ -148,45 +143,29 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer() {
-            Vector3 moveVector = CalculateHorizontalMovement();
-            Vector3 verticalMoveVector = CalculateVerticalMovement();
+            Vector3 movementVector = CalculateTwoDimensionalMovement();
+            float verticalMoveValue = gravityManager.CalculateVerticalMovement();
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
-            if (moveVector != Vector3.zero && verticalMoveVector == Vector3.zero) {
-                verticalMoveVector = new Vector3(0, defaultVerticalVelocity, 0);
+            if (movementVector != Vector3.zero && verticalMoveValue == 0) {
+                verticalMoveValue = defaultVerticalVelocity;
             }
 
-            moveVector += verticalMoveVector;
-            if (moveVector != Vector3.zero) {
+            movementVector += new Vector3(0, verticalMoveValue, 0);
+            if (movementVector != Vector3.zero) {
                 // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
-                playerController.Move(moveVector * Time.deltaTime);
+                playerController.Move(movementVector * Time.deltaTime);
             }
         }
 
-        private bool CurrentlyFalling() {
-            return startedFallingVertically && !finishedFallingVertically;
-        }
-
-        private Vector3 CalculateHorizontalMovement() {
+        private Vector3 CalculateTwoDimensionalMovement() {
             if (inputMoveVector == Vector2.zero) {
                 return Vector3.zero;
             }
 
-            Vector3 inputMoveVector3 = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
-            Vector3 worldMoveDirection = transform.TransformDirection(inputMoveVector3);
-
-            // normalize converts the magnitude to 1 no matter what
+            Vector3 localMoveDirection = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
+            Vector3 worldMoveDirection = transform.TransformDirection(localMoveDirection);
             return worldMoveDirection.normalized * groundSpeedValue;
-        }
-
-        public Vector3 CalculateVerticalMovement() {
-            if (!CurrentlyFalling()) {
-                verticalVelocity = defaultVerticalVelocity;
-                return Vector3.zero;
-            }
-
-            verticalVelocity -= gravity * Time.deltaTime;
-            return new Vector3(0, verticalVelocity, 0);
         }
 
         private void UpdateGroundSpeed() {
@@ -202,24 +181,6 @@ namespace ControlProto.Scripts.Player {
                 groundSpeed = GroundSpeed.Walking;
                 groundSpeedValue = walkMovementSpeed;
             }
-        }
-
-        private void UpdateFallingCheck() {
-            float lastYPosition = lastPosition.y;
-            float yPosition = transform.position.y;
-            bool isFallingVertically = (Mathf.Abs(yPosition - lastYPosition) > floatTolerance) && (yPosition < lastYPosition);
-
-            if (isFallingVertically && !startedFallingVertically) {
-                startedFallingVertically = true;
-                finishedFallingVertically = false;
-            }
-
-            if (!isFallingVertically && startedFallingVertically) {
-                startedFallingVertically = false;
-                finishedFallingVertically = true;
-            }
-
-            lastPosition = transform.position;
         }
 
         private void BindInput() {
