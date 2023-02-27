@@ -23,7 +23,8 @@ namespace ControlProto.Scripts.Player {
         private Transform playerCamera;
         private GravityManager gravityManager;
         private LookInput lookInput;
-        private MoveInput moveInput;
+        private TwoDimensionMovement twoDimensionMovement;
+        private CursorManager cursorManager;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
@@ -31,26 +32,16 @@ namespace ControlProto.Scripts.Player {
         private readonly List<InputAction> inputActions = new();
         private DefaultInputActions defaultInputActions;
 
-        private GroundSpeed groundSpeed = GroundSpeed.Walking;
-        private PlayerState playerState = PlayerState.Idle;
-
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
-        private float groundSpeedValue;
-
-        private bool isCrouchButtonHeldDown;
-        private bool isSprintButtonHeldDown;
 
         private void Awake() {
-            groundSpeedValue = walkMovementSpeed;
-            gravityManager = new GravityManager(gravity, floatTolerance, defaultVerticalVelocity, transform.position.y);
-
             defaultInputActions = new DefaultInputActions();
+            defaultInputActions.Enable();
+            cursorManager = new CursorManager();
+            gravityManager = new GravityManager(gravity, floatTolerance, defaultVerticalVelocity, transform.position.y);
+            twoDimensionMovement = new TwoDimensionMovement(defaultInputActions, crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed);
             lookInput = new LookInput(defaultInputActions);
-            moveInput = new MoveInput(defaultInputActions);
-
-            LockCursor();
-            BindInput();
         }
 
         private void Start() {
@@ -62,61 +53,6 @@ namespace ControlProto.Scripts.Player {
             gravityManager.UpdateFallingCheck(transform.position.y);
             RotatePlayerAndCamera();
             MovePlayer();
-        }
-
-        private void ExitFocusCallback(InputAction.CallbackContext context) {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
-        private void CrouchStartedCallback(InputAction.CallbackContext context) {
-            isCrouchButtonHeldDown = true;
-            groundSpeed = GroundSpeed.Crouching;
-            groundSpeedValue = crouchMovementSpeed;
-        }
-
-        private void CrouchCanceledCallback(InputAction.CallbackContext context) {
-            isCrouchButtonHeldDown = false;
-            groundSpeed = isSprintButtonHeldDown ? GroundSpeed.Sprinting : GroundSpeed.Walking;
-            groundSpeedValue = isSprintButtonHeldDown ? sprintMovementSpeed : walkMovementSpeed;
-        }
-
-        private void SprintStartedCallback(InputAction.CallbackContext context) {
-            isSprintButtonHeldDown = true;
-            groundSpeed = isCrouchButtonHeldDown ? GroundSpeed.Crouching : GroundSpeed.Sprinting;
-            groundSpeedValue = isCrouchButtonHeldDown ? crouchMovementSpeed : sprintMovementSpeed;
-        }
-
-        private void SprintCanceledCallback(InputAction.CallbackContext context) {
-            isSprintButtonHeldDown = false;
-            groundSpeed = isCrouchButtonHeldDown ? GroundSpeed.Crouching : GroundSpeed.Walking;
-            groundSpeedValue = isCrouchButtonHeldDown ? crouchMovementSpeed : walkMovementSpeed;
-        }
-
-        private void OnEnable() {
-            defaultInputActions.Enable();
-            foreach (InputAction inputAction in inputActions) {
-                inputAction.Enable();
-            }
-        }
-
-        private void OnDisable() {
-            defaultInputActions.Disable();
-            foreach (InputAction inputAction in inputActions) {
-                inputAction.Disable();
-            }
-        }
-
-        private void OnDestroy() {
-            defaultInputActions.Dispose();
-            foreach (InputAction inputAction in inputActions) {
-                inputAction.Dispose();
-            }
-        }
-
-        private void LockCursor() {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
 
         private void CreateController() {
@@ -151,7 +87,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void MovePlayer() {
-            Vector3 movementVector = CalculateTwoDimensionalMovement();
+            Vector3 movementVector = twoDimensionMovement.CalculateTwoDimensionalMovement(transform);
             float verticalMoveValue = gravityManager.CalculateVerticalMovement();
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
@@ -166,35 +102,24 @@ namespace ControlProto.Scripts.Player {
             }
         }
 
-        private Vector3 CalculateTwoDimensionalMovement() {
-            if (moveInput.Value == Vector2.zero) {
-                return Vector3.zero;
-            }
-
-            Vector3 localMoveDirection = new Vector3(moveInput.Value.x, 0, moveInput.Value.y);
-            Vector3 worldMoveDirection = transform.TransformDirection(localMoveDirection);
-            return worldMoveDirection.normalized * groundSpeedValue;
-        }
-
-        private void BindInput() {
-            InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
-            crouchAction.started += CrouchStartedCallback;
-            crouchAction.canceled += CrouchCanceledCallback;
-            inputActions.Add(crouchAction);
-
-            InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
-            sprintAction.started += SprintStartedCallback;
-            sprintAction.canceled += SprintCanceledCallback;
-            inputActions.Add(sprintAction);
-
-            InputAction exitFocusAction = new InputAction("ExitFocus", InputActionType.Button, "<Keyboard>/escape");
-            exitFocusAction.performed += ExitFocusCallback;
-            inputActions.Add(exitFocusAction);
-
-            defaultInputActions.Enable();
-            foreach (InputAction inputAction in inputActions) {
-                inputAction.Enable();
-            }
-        }
+        // private void BindInput() {
+        //     foreach (InputAction inputAction in inputActions) {
+        //         inputAction.Enable();
+        //     }
+        // }
+        //
+        // private void OnDisable() {
+        //     defaultInputActions.Disable();
+        //     foreach (InputAction inputAction in inputActions) {
+        //         inputAction.Disable();
+        //     }
+        // }
+        //
+        // private void OnDestroy() {
+        //     defaultInputActions.Dispose();
+        //     foreach (InputAction inputAction in inputActions) {
+        //         inputAction.Dispose();
+        //     }
+        // }
     }
 }
