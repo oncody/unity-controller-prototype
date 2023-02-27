@@ -21,38 +21,30 @@ namespace ControlProto.Scripts.Player {
 
         private CharacterController playerController;
         private Transform playerCamera;
-        private GravityManager gravityManager;
         private LookInput lookInput;
-        private TwoDimensionMovement twoDimensionMovement;
         private CursorManager cursorManager;
+        private CharacterControllerMover characterControllerMover;
+        private DefaultInputActions defaultInputActions;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
-
-        private readonly List<InputAction> inputActions = new();
-        private DefaultInputActions defaultInputActions;
 
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
 
         private void Awake() {
+            CreateController();
+            CreateCamera();
             defaultInputActions = new DefaultInputActions();
             defaultInputActions.Enable();
             cursorManager = new CursorManager();
-            gravityManager = new GravityManager(gravity, floatTolerance, defaultVerticalVelocity, transform.position.y);
-            twoDimensionMovement = new TwoDimensionMovement(defaultInputActions, crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed);
+            characterControllerMover = new CharacterControllerMover(playerController, defaultInputActions, transform, crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed, gravity, floatTolerance, defaultVerticalVelocity);
             lookInput = new LookInput(defaultInputActions);
         }
 
-        private void Start() {
-            CreateController();
-            CreateCamera();
-        }
-
         private void Update() {
-            gravityManager.UpdateFallingCheck(transform.position.y);
+            characterControllerMover.MovePlayer(transform);
             RotatePlayerAndCamera();
-            MovePlayer();
         }
 
         private void CreateController() {
@@ -84,22 +76,6 @@ namespace ControlProto.Scripts.Player {
 
             // Rotate player left and right
             transform.rotation = Quaternion.Euler(0, yaw, 0);
-        }
-
-        private void MovePlayer() {
-            Vector3 movementVector = twoDimensionMovement.CalculateTwoDimensionalMovement(transform);
-            float verticalMoveValue = gravityManager.CalculateVerticalMovement();
-
-            // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.
-            if (movementVector != Vector3.zero && verticalMoveValue == 0) {
-                verticalMoveValue = defaultVerticalVelocity;
-            }
-
-            movementVector += new Vector3(0, verticalMoveValue, 0);
-            if (movementVector != Vector3.zero) {
-                // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
-                playerController.Move(movementVector * Time.deltaTime);
-            }
         }
 
         //
