@@ -67,22 +67,26 @@ namespace ControlProto.Scripts.Player {
 
         private void CrouchStartedCallback(InputAction.CallbackContext context) {
             isCrouchButtonHeldDown = true;
-            UpdateGroundSpeed();
+            groundSpeed = GroundSpeed.Crouching;
+            groundSpeedValue = crouchMovementSpeed;
         }
 
         private void CrouchCanceledCallback(InputAction.CallbackContext context) {
             isCrouchButtonHeldDown = false;
-            UpdateGroundSpeed();
+            groundSpeed = isSprintButtonHeldDown ? GroundSpeed.Sprinting : GroundSpeed.Walking;
+            groundSpeedValue = isSprintButtonHeldDown ? sprintMovementSpeed : walkMovementSpeed;
         }
 
         private void SprintStartedCallback(InputAction.CallbackContext context) {
             isSprintButtonHeldDown = true;
-            UpdateGroundSpeed();
+            groundSpeed = isCrouchButtonHeldDown ? GroundSpeed.Crouching : GroundSpeed.Sprinting;
+            groundSpeedValue = isCrouchButtonHeldDown ? crouchMovementSpeed : sprintMovementSpeed;
         }
 
         private void SprintCanceledCallback(InputAction.CallbackContext context) {
             isSprintButtonHeldDown = false;
-            UpdateGroundSpeed();
+            groundSpeed = isCrouchButtonHeldDown ? GroundSpeed.Crouching : GroundSpeed.Walking;
+            groundSpeedValue = isCrouchButtonHeldDown ? crouchMovementSpeed : walkMovementSpeed;
         }
 
         private void OnEnable() {
@@ -166,21 +170,6 @@ namespace ControlProto.Scripts.Player {
             Vector3 localMoveDirection = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
             Vector3 worldMoveDirection = transform.TransformDirection(localMoveDirection);
             return worldMoveDirection.normalized * groundSpeedValue;
-        }
-
-        private void UpdateGroundSpeed() {
-            if (isCrouchButtonHeldDown) {
-                groundSpeed = GroundSpeed.Crouching;
-                groundSpeedValue = crouchMovementSpeed;
-            }
-            else if (isSprintButtonHeldDown) {
-                groundSpeed = GroundSpeed.Sprinting;
-                groundSpeedValue = sprintMovementSpeed;
-            }
-            else {
-                groundSpeed = GroundSpeed.Walking;
-                groundSpeedValue = walkMovementSpeed;
-            }
         }
 
         private void BindInput() {
