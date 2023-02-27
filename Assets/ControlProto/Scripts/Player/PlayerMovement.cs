@@ -21,16 +21,10 @@ namespace ControlProto.Scripts.Player {
 
         private CharacterController playerController;
         private Transform playerCamera;
-        private LookInput lookInput;
         private CursorManager cursorManager;
         private CharacterControllerMover characterControllerMover;
         private DefaultInputActions defaultInputActions;
-
-        private const float MaxPitch = 90;
-        private const float MinPitch = -90;
-
-        private float pitch; // up-down rotation around x-axis
-        private float yaw; // left-right rotation around y-axis
+        private RotationManager rotationManager;
 
         private void Awake() {
             CreateController();
@@ -39,12 +33,12 @@ namespace ControlProto.Scripts.Player {
             defaultInputActions.Enable();
             cursorManager = new CursorManager();
             characterControllerMover = new CharacterControllerMover(playerController, defaultInputActions, transform, crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed, gravity, floatTolerance, defaultVerticalVelocity);
-            lookInput = new LookInput(defaultInputActions);
+            rotationManager = new RotationManager(transform, playerCamera, defaultInputActions, horizontalMouseSensitivity, verticalMouseSensitivity);
         }
 
         private void Update() {
             characterControllerMover.MovePlayer(transform);
-            RotatePlayerAndCamera();
+            rotationManager.PerformRotations();
         }
 
         private void CreateController() {
@@ -64,18 +58,6 @@ namespace ControlProto.Scripts.Player {
             cameraBrainObject.transform.SetParent(transform);
             Camera cameraComponent = cameraBrainObject.AddComponent<Camera>();
             CinemachineBrain brainComponent = cameraBrainObject.AddComponent<CinemachineBrain>();
-        }
-
-        private void RotatePlayerAndCamera() {
-            yaw += lookInput.Value.x * horizontalMouseSensitivity;
-            pitch -= lookInput.Value.y * verticalMouseSensitivity;
-            pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
-
-            // Rotate camera up and down
-            playerCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
-
-            // Rotate player left and right
-            transform.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
         //
