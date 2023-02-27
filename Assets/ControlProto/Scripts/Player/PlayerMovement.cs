@@ -19,9 +19,11 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float defaultVerticalVelocity;
         [SerializeField] private float cameralOffsetFromPlayerCeiling;
 
-        private GravityManager gravityManager;
         private CharacterController playerController;
         private Transform playerCamera;
+        private GravityManager gravityManager;
+        private LookInput lookInput;
+        private MoveInput moveInput;
 
         private const float MaxPitch = 90;
         private const float MinPitch = -90;
@@ -31,9 +33,6 @@ namespace ControlProto.Scripts.Player {
 
         private GroundSpeed groundSpeed = GroundSpeed.Walking;
         private PlayerState playerState = PlayerState.Idle;
-
-        private Vector2 inputMoveVector;
-        private Vector2 inputLookVector;
 
         private float pitch; // up-down rotation around x-axis
         private float yaw; // left-right rotation around y-axis
@@ -45,6 +44,11 @@ namespace ControlProto.Scripts.Player {
         private void Awake() {
             groundSpeedValue = walkMovementSpeed;
             gravityManager = new GravityManager(gravity, floatTolerance, defaultVerticalVelocity, transform.position.y);
+
+            defaultInputActions = new DefaultInputActions();
+            lookInput = new LookInput(defaultInputActions);
+            moveInput = new MoveInput(defaultInputActions);
+
             LockCursor();
             BindInput();
         }
@@ -116,7 +120,7 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void CreateController() {
-            // Offset the character mesh so that it is slightly above the character controller. This prevents the player from floating
+            // Offset the character mesh so that it is slightly above the character controller. This prevents the player from floating above the ground
             playerController = gameObject.AddComponent<CharacterController>();
             playerController.center += new Vector3(0, playerController.skinWidth, 0);
         }
@@ -135,8 +139,8 @@ namespace ControlProto.Scripts.Player {
         }
 
         private void RotatePlayerAndCamera() {
-            yaw += inputLookVector.x * horizontalMouseSensitivity;
-            pitch -= inputLookVector.y * verticalMouseSensitivity;
+            yaw += lookInput.Value.x * horizontalMouseSensitivity;
+            pitch -= lookInput.Value.y * verticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, MinPitch, MaxPitch);
 
             // Rotate camera up and down
@@ -163,23 +167,16 @@ namespace ControlProto.Scripts.Player {
         }
 
         private Vector3 CalculateTwoDimensionalMovement() {
-            if (inputMoveVector == Vector2.zero) {
+            if (moveInput.Value == Vector2.zero) {
                 return Vector3.zero;
             }
 
-            Vector3 localMoveDirection = new Vector3(inputMoveVector.x, 0, inputMoveVector.y);
+            Vector3 localMoveDirection = new Vector3(moveInput.Value.x, 0, moveInput.Value.y);
             Vector3 worldMoveDirection = transform.TransformDirection(localMoveDirection);
             return worldMoveDirection.normalized * groundSpeedValue;
         }
 
         private void BindInput() {
-            defaultInputActions = new DefaultInputActions();
-            defaultInputActions.Player.Move.performed += context => inputMoveVector = context.ReadValue<Vector2>();
-            defaultInputActions.Player.Move.canceled += _ => inputMoveVector = Vector2.zero;
-
-            defaultInputActions.Player.Look.performed += context => inputLookVector = context.ReadValue<Vector2>();
-            defaultInputActions.Player.Look.canceled += _ => inputLookVector = Vector2.zero;
-
             InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
             crouchAction.started += CrouchStartedCallback;
             crouchAction.canceled += CrouchCanceledCallback;
