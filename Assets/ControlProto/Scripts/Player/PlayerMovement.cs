@@ -102,11 +102,6 @@ namespace ControlProto.Scripts.Player {
             }
         }
 
-        // private void BindInput() {
-        //     foreach (InputAction inputAction in inputActions) {
-        //         inputAction.Enable();
-        //     }
-        // }
         //
         // private void OnDisable() {
         //     defaultInputActions.Disable();
