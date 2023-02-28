@@ -1,6 +1,7 @@
 using Cinemachine;
 using ControlProto.Util;
 using ControlProto.Util.Gravity;
+using ControlProto.Util.PlayerController;
 using ControlProto.Util.PlayerController.FirstPerson;
 using ControlProto.Util.PlayerInputSystem;
 using ControlProto.Util.PlayerInputSystem.New;
@@ -25,7 +26,7 @@ namespace ControlProto.Scripts.Player {
         private const float MaxPitch = 90;
 
         private DefaultInputActions defaultInputActions;
-        private FirstPersonController firstPersonController;
+        private PlayerController firstPersonController;
 
         private void Awake() {
             defaultInputActions = new DefaultInputActions();

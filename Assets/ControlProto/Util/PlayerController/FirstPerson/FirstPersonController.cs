@@ -6,10 +6,10 @@ using ControlProto.Util.TwoDimensionalGroundPlaneMovement;
 using UnityEngine;
 
 namespace ControlProto.Util.PlayerController.FirstPerson {
-    public class FirstPersonController {
-        private readonly FirstPersonThreeDimensionalMovement threeDimensionalMovement;
-        private readonly FirstPersonCameraRotation cameraRotation;
-        private readonly FirstPersonPlayerRotation playerRotation;
+    public class FirstPersonController : PlayerController {
+        private readonly IPlayerMovement playerMovement;
+        private readonly ICameraRotation cameraRotation;
+        private readonly IPlayerRotation playerRotation;
 
         public FirstPersonController(
             IPlayerInputSystem inputSystem,
@@ -23,13 +23,19 @@ namespace ControlProto.Util.PlayerController.FirstPerson {
             cameraRotation = new FirstPersonCameraRotation(inputSystem, camera, mouseSensitivities, pitchBounds);
             playerRotation = new FirstPersonPlayerRotation(inputSystem, player, mouseSensitivities);
             FirstPersonTwoDimensionalMovement firstPersonTwoDimensionalMovement = new FirstPersonTwoDimensionalMovement(inputSystem, speedManager);
-            threeDimensionalMovement = new FirstPersonThreeDimensionalMovement(controller, player, firstPersonTwoDimensionalMovement, gravityManager);
+            playerMovement = new FirstPersonThreeDimensionalMovement(controller, player, firstPersonTwoDimensionalMovement, gravityManager);
         }
 
-        public void Update() {
-            cameraRotation.Rotate();
-            playerRotation.Rotate();
-            threeDimensionalMovement.MovePlayer();
+        public override ICameraRotation CameraRotation() {
+            return cameraRotation;
+        }
+
+        public override IPlayerMovement PlayerMovement() {
+            return playerMovement;
+        }
+
+        public override IPlayerRotation PlayerRotation() {
+            return playerRotation;
         }
     }
 }

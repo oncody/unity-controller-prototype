@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace ControlProto.Util.PlayerController.FirstPerson {
-    public class FirstPersonThreeDimensionalMovement {
+    public class FirstPersonThreeDimensionalMovement : IPlayerMovement {
         private readonly CharacterController controller;
         private readonly Transform player;
         private readonly FirstPersonTwoDimensionalMovement firstPersonTwoDimensionalMovement;

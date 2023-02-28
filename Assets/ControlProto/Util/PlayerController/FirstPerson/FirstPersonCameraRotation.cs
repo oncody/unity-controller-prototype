@@ -3,7 +3,7 @@ using ControlProto.Util.PlayerRotation;
 using UnityEngine;
 
 namespace ControlProto.Util.PlayerController.FirstPerson {
-    public class FirstPersonCameraRotation {
+    public class FirstPersonCameraRotation : ICameraRotation {
         private readonly IPlayerInputSystem inputSystem;
         private readonly Transform camera;
         private readonly MouseSensitivities mouseSensitivities;
