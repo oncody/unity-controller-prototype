@@ -43,13 +43,13 @@ namespace ControlProto.Scripts.Player {
             GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
-            firstPersonController = new FirstPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants, cameraOffsetFromPlayerCeiling);
-            // thirdPersonController = new ThirdPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants);
+            // firstPersonController = new FirstPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants, cameraOffsetFromPlayerCeiling);
+            thirdPersonController = new ThirdPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants);
         }
 
         private void Update() {
-            firstPersonController.Update();
-            // thirdPersonController.Update();
+            // firstPersonController.Update();
+            thirdPersonController.Update();
         }
 
         private CharacterController InitializeController() {

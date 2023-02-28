@@ -13,8 +13,7 @@ namespace ControlProto.Util.PlayerController {
         }
 
         public void Update() {
-            RotateCamera();
-            RotatePlayer();
+            PerformRotations();
             MovePlayer();
         }
 
@@ -40,9 +39,7 @@ namespace ControlProto.Util.PlayerController {
             return movementVector + new Vector3(0, verticalMoveValue, 0);
         }
 
-        // public abstract void CreateCamera();
-        public abstract void RotateCamera();
-        public abstract void RotatePlayer();
+        public abstract void PerformRotations();
 
         // Maybe make this Vector2 in the future
         public abstract Vector3 TwoDimensionalMovement();

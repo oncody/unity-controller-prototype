@@ -9,7 +9,7 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
     public class ThirdPersonController : PlayerController {
         private readonly IPlayerInputSystem inputSystem;
         private readonly PlayerObjects playerObjects;
-        private readonly Transform virtualCamera;
+        private readonly CinemachineFreeLook virtualCamera;
         private readonly SpeedManager speedManager;
         private readonly PlayerLookConstants lookConstants;
 
@@ -24,7 +24,7 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
             virtualCamera = InitializeCamera();
         }
 
-        private Transform InitializeCamera() {
+        private CinemachineFreeLook InitializeCamera() {
             GameObject cameraObject = new GameObject("ThirdPersonCamera");
             cameraObject.transform.SetParent(playerObjects.Player);
             // cameraObject.transform.localPosition = new Vector3(0, (playerObjects.Controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
@@ -35,6 +35,8 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
             camera.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
             camera.m_YAxis.m_InvertInput = true;
             camera.m_XAxis.m_InvertInput = false;
+            camera.m_XAxis.m_InputAxisName = "";
+            camera.m_YAxis.m_InputAxisName = "";
 
             // top rig
             camera.m_Orbits[0].m_Height = 5;
@@ -53,21 +55,29 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
             cameraCollider.m_CollideAgainst = 1 << LayerMask.NameToLayer("Ground");
             camera.AddExtension(cameraCollider);
 
-            return camera.transform;
+            return camera;
         }
 
         // Right now its automatically bound to mouse input
-        public override void RotateCamera() {
+        // perhaps this needs to be camera and not virtual camera
+        public override void PerformRotations() {
+            float horizontalInput = inputSystem.HorizontalLookInput();
             float verticalInput = inputSystem.VerticalLookInput();
+
+            yaw += horizontalInput * lookConstants.HorizontalMouseSensitivity;
             pitch -= verticalInput * lookConstants.VerticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, lookConstants.MinPitch, lookConstants.MaxPitch);
-            // virtualCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
-        }
 
-        public override void RotatePlayer() {
-            float horizontalInput = inputSystem.HorizontalLookInput();
-            yaw += horizontalInput * lookConstants.HorizontalMouseSensitivity;
-            // player.rotation = Quaternion.Euler(0, yaw, 0);
+            // virtualCamera.rotation *= Quaternion.Euler(pitch, yaw, 0);
+            // virtualCamera.rotation *= Quaternion.Euler(verticalInput, horizontalInput, 0);
+            // virtualCamera.m_XAxis.Value = yaw;
+            // virtualCamera.m_YAxis.Value = pitch;
+
+            // virtualCamera.m_XAxis.m_InputAxisValue = yaw;
+            // virtualCamera.m_YAxis.m_InputAxisValue = pitch;
+
+            virtualCamera.m_XAxis.m_InputAxisValue = horizontalInput * lookConstants.HorizontalMouseSensitivity;
+            virtualCamera.m_YAxis.m_InputAxisValue = verticalInput * lookConstants.VerticalMouseSensitivity;
         }
 
         public override Vector3 TwoDimensionalMovement() {
@@ -80,6 +90,7 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
             float verticalInput = inputSystem.VerticalLMoveInput();
             Vector3 localMoveDirection = new Vector3(horizontalInput, 0, verticalInput);
 
+            // todo: maybe just make sure its not equal to 0?
             if (localMoveDirection.magnitude >= 0.1f) {
                 // this needs to get the rotation of the scene camera. not the virtual camera
                 float targetangle = Mathf.Atan2(localMoveDirection.x, localMoveDirection.z) * Mathf.Rad2Deg + playerObjects.Camera.eulerAngles.y;

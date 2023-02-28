@@ -35,16 +35,12 @@ namespace ControlProto.Util.PlayerController.FirstPerson {
         }
 
         // todo: try to change this to the virtual camera
-        public override void RotateCamera() {
-            float verticalInput = inputSystem.VerticalLookInput();
-            pitch -= verticalInput * lookConstants.VerticalMouseSensitivity;
+        public override void PerformRotations() {
+            yaw += inputSystem.HorizontalLookInput() * lookConstants.HorizontalMouseSensitivity;
+            pitch -= inputSystem.VerticalLookInput() * lookConstants.VerticalMouseSensitivity;
             pitch = Mathf.Clamp(pitch, lookConstants.MinPitch, lookConstants.MaxPitch);
-            virtualCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
-        }
 
-        public override void RotatePlayer() {
-            float horizontalInput = inputSystem.HorizontalLookInput();
-            yaw += horizontalInput * lookConstants.HorizontalMouseSensitivity;
+            virtualCamera.localRotation = Quaternion.Euler(pitch, 0, 0);
             playerObjects.Player.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
