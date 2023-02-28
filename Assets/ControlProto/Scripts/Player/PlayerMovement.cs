@@ -63,6 +63,7 @@ namespace ControlProto.Scripts.Player {
             GameObject cameraObject = new GameObject("ThirdPersonCamera");
             cameraObject.transform.SetParent(transform);
             cameraObject.transform.localPosition = new Vector3(0, (controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
+
             CinemachineFreeLook freeLookCamera = cameraObject.AddComponent<CinemachineFreeLook>();
             freeLookCamera.m_Follow = transform;
             freeLookCamera.m_LookAt = transform;
@@ -81,6 +82,12 @@ namespace ControlProto.Scripts.Player {
             // bottom rig
             freeLookCamera.m_Orbits[2].m_Height = -1;
             freeLookCamera.m_Orbits[2].m_Radius = 1;
+
+            CinemachineCollider cameraCollider = cameraObject.AddComponent<CinemachineCollider>();
+            cameraCollider.m_Strategy = CinemachineCollider.ResolutionStrategy.PullCameraForward;
+            cameraCollider.m_CollideAgainst = 1 << LayerMask.NameToLayer("Ground");
+            freeLookCamera.AddExtension(cameraCollider);
+
             return freeLookCamera;
         }
 
