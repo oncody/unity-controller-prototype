@@ -3,6 +3,7 @@ using ControlProto.Util;
 using ControlProto.Util.Gravity;
 using ControlProto.Util.PlayerController;
 using ControlProto.Util.PlayerController.FirstPerson;
+using ControlProto.Util.PlayerController.ThirdPerson;
 using ControlProto.Util.PlayerInputSystem;
 using ControlProto.Util.PlayerInputSystem.New;
 using ControlProto.Util.PlayerRotation;
@@ -27,6 +28,7 @@ namespace ControlProto.Scripts.Player {
 
         private DefaultInputActions defaultInputActions;
         private PlayerController firstPersonController;
+        private PlayerController thirdPersonController;
 
         private void Awake() {
             defaultInputActions = new DefaultInputActions();
@@ -41,10 +43,12 @@ namespace ControlProto.Scripts.Player {
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
             firstPersonController = new FirstPersonController(inputSystem, controller, virtualCamera.transform, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
+            thirdPersonController = new ThirdPersonController(inputSystem, controller, virtualCamera.transform, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
         }
 
         private void Update() {
-            firstPersonController.Update();
+            // firstPersonController.Update();
+            thirdPersonController.Update();
         }
 
         private CharacterController InitializeController() {
@@ -66,6 +70,19 @@ namespace ControlProto.Scripts.Player {
             cameraBrainObject.AddComponent<CinemachineBrain>();
             return virtualCamera;
         }
+
+        // private CinemachineVirtualCamera InitializeCameras(CharacterController controller) {
+        //     GameObject cameraObject = new GameObject("CinemachineVirtualCamera");
+        //     cameraObject.transform.SetParent(transform);
+        //     cameraObject.transform.localPosition = new Vector3(0, (controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
+        //     CinemachineVirtualCamera virtualCamera = cameraObject.AddComponent<CinemachineVirtualCamera>();
+        //
+        //     GameObject cameraBrainObject = new GameObject("CameraBrain");
+        //     cameraBrainObject.transform.SetParent(transform);
+        //     cameraBrainObject.AddComponent<Camera>();
+        //     cameraBrainObject.AddComponent<CinemachineBrain>();
+        //     return virtualCamera;
+        // }
 
         //
         // private void OnDisable() {
