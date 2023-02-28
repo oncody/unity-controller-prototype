@@ -11,11 +11,11 @@ namespace ControlProto.Util.TwoDimensionalGroundPlaneMovement {
         }
 
         public float Value() {
-            if (inputSystem.CrouchInput().IsHeldDown()) {
+            if (inputSystem.CrouchInput()) {
                 return speeds.Crouch;
             }
 
-            return (inputSystem.SprintInput().IsHeldDown()) ? speeds.Sprint : speeds.Walk;
+            return (inputSystem.SprintInput()) ? speeds.Sprint : speeds.Walk;
         }
     }
 }

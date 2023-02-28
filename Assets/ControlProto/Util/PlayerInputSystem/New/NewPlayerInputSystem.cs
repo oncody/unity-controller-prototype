@@ -1,36 +1,85 @@
-﻿using UnityEngine.InputSystem;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ControlProto.Util.PlayerInputSystem.New {
     public class NewPlayerInputSystem : IPlayerInputSystem {
         private readonly DefaultInputActions defaultInputActions;
-        private readonly IPlayerVector2Input lookInput;
-        private readonly IPlayerVector2Input moveInput;
-        private readonly IPlayerToggleInput crouchInput;
-        private readonly IPlayerToggleInput sprintInput;
+        private Vector2 lookInput = Vector2.zero;
+        private Vector2 moveInput = Vector2.zero;
+        private bool isCrouchButtonHeldDown;
+        private bool isSprintButtonHeldDown;
 
         public NewPlayerInputSystem(DefaultInputActions defaultInputActions) {
             this.defaultInputActions = defaultInputActions;
-            lookInput = new NewLookInput(this.defaultInputActions);
-            moveInput = new NewMoveInput(this.defaultInputActions);
-            crouchInput = new NewCrouchInput();
-            sprintInput = new NewSprintInput();
+            InitializeLookInput();
+            InitializeMoveInput();
+            InitializeCrouchInput();
+            InitializeSprintInput();
             defaultInputActions.Enable();
         }
 
-        public IPlayerVector2Input LookInput() {
-            return lookInput;
+        private void InitializeLookInput() {
+            defaultInputActions.Player.Look.performed += context => lookInput = context.ReadValue<Vector2>();
+            defaultInputActions.Player.Look.canceled += _ => lookInput = Vector2.zero;
         }
 
-        public IPlayerVector2Input MoveInput() {
-            return moveInput;
+        private void InitializeMoveInput() {
+            defaultInputActions.Player.Move.performed += context => moveInput = context.ReadValue<Vector2>();
+            defaultInputActions.Player.Move.canceled += _ => moveInput = Vector2.zero;
         }
 
-        public IPlayerToggleInput CrouchInput() {
-            return crouchInput;
+        private void InitializeCrouchInput() {
+            InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
+            crouchAction.started += CrouchStartedCallback;
+            crouchAction.canceled += CrouchCanceledCallback;
+            crouchAction.Enable();
         }
 
-        public IPlayerToggleInput SprintInput() {
-            return sprintInput;
+        private void InitializeSprintInput() {
+            InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
+            sprintAction.started += SprintStartedCallback;
+            sprintAction.canceled += SprintCanceledCallback;
+            sprintAction.Enable();
+        }
+
+        private void CrouchStartedCallback(InputAction.CallbackContext context) {
+            isCrouchButtonHeldDown = true;
+        }
+
+        private void CrouchCanceledCallback(InputAction.CallbackContext context) {
+            isCrouchButtonHeldDown = false;
+        }
+
+        private void SprintStartedCallback(InputAction.CallbackContext context) {
+            isSprintButtonHeldDown = true;
+        }
+
+        private void SprintCanceledCallback(InputAction.CallbackContext context) {
+            isSprintButtonHeldDown = false;
+        }
+
+        public float HorizontalLookInput() {
+            return lookInput.x;
+        }
+
+        public float VerticalLookInput() {
+            return lookInput.y;
+        }
+
+        public float HorizontalMoveInput() {
+            return moveInput.x;
+        }
+
+        public float VerticalLMoveInput() {
+            return moveInput.y;
+        }
+
+        public bool CrouchInput() {
+            return isCrouchButtonHeldDown;
+        }
+
+        public bool SprintInput() {
+            return isSprintButtonHeldDown;
         }
     }
 }
