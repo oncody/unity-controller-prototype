@@ -30,32 +30,16 @@ namespace ControlProto.Util.PlayerInputSystem.New {
 
         private void InitializeCrouchInput() {
             InputAction crouchAction = new InputAction("Crouch", InputActionType.Value, "<Keyboard>/leftCtrl");
-            crouchAction.started += CrouchStartedCallback;
-            crouchAction.canceled += CrouchCanceledCallback;
+            crouchAction.started += _ => isCrouchButtonHeldDown = true;
+            crouchAction.canceled += _ => isCrouchButtonHeldDown = false;
             crouchAction.Enable();
         }
 
         private void InitializeSprintInput() {
             InputAction sprintAction = new InputAction("Sprint", InputActionType.Value, "<Keyboard>/leftShift");
-            sprintAction.started += SprintStartedCallback;
-            sprintAction.canceled += SprintCanceledCallback;
+            sprintAction.started += _ => isSprintButtonHeldDown = true;
+            sprintAction.canceled += _ => isSprintButtonHeldDown = false;
             sprintAction.Enable();
-        }
-
-        private void CrouchStartedCallback(InputAction.CallbackContext context) {
-            isCrouchButtonHeldDown = true;
-        }
-
-        private void CrouchCanceledCallback(InputAction.CallbackContext context) {
-            isCrouchButtonHeldDown = false;
-        }
-
-        private void SprintStartedCallback(InputAction.CallbackContext context) {
-            isSprintButtonHeldDown = true;
-        }
-
-        private void SprintCanceledCallback(InputAction.CallbackContext context) {
-            isSprintButtonHeldDown = false;
         }
 
         public float HorizontalLookInput() {
