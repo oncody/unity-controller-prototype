@@ -5,19 +5,21 @@ using UnityEngine;
 namespace ControlProto.Util.PlayerController.FirstPerson {
     public class FirstPersonPlayerRotation {
         private readonly IPlayerInputSystem inputSystem;
+        private readonly Transform player;
         private readonly MouseSensitivities mouseSensitivities;
 
         private float yaw; // left-right rotation around y-axis
 
-        public FirstPersonPlayerRotation(IPlayerInputSystem inputSystem, MouseSensitivities mouseSensitivities) {
+        public FirstPersonPlayerRotation(IPlayerInputSystem inputSystem, Transform player, MouseSensitivities mouseSensitivities) {
             this.inputSystem = inputSystem;
+            this.player = player;
             this.mouseSensitivities = mouseSensitivities;
         }
 
-        public Quaternion Value() {
+        public void Rotate() {
             float horizontalInput = inputSystem.LookInput().Value().x;
             yaw += horizontalInput * mouseSensitivities.Horizontal;
-            return Quaternion.Euler(0, yaw, 0);
+            player.rotation = Quaternion.Euler(0, yaw, 0);
         }
     }
 }

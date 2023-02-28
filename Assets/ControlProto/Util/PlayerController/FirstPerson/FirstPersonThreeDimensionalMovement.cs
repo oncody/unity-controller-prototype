@@ -3,15 +3,27 @@ using UnityEngine;
 
 namespace ControlProto.Util.PlayerController.FirstPerson {
     public class FirstPersonThreeDimensionalMovement {
+        private readonly CharacterController controller;
+        private readonly Transform player;
         private readonly FirstPersonTwoDimensionalMovement firstPersonTwoDimensionalMovement;
         private readonly GravityManager gravityManager;
 
-        public FirstPersonThreeDimensionalMovement(FirstPersonTwoDimensionalMovement firstPersonTwoDimensionalMovement, GravityManager gravityManager) {
+        public FirstPersonThreeDimensionalMovement(CharacterController controller, Transform player, FirstPersonTwoDimensionalMovement firstPersonTwoDimensionalMovement, GravityManager gravityManager) {
+            this.controller = controller;
+            this.player = player;
             this.firstPersonTwoDimensionalMovement = firstPersonTwoDimensionalMovement;
             this.gravityManager = gravityManager;
         }
 
-        public Vector3 Value(Transform player) {
+        public void MovePlayer() {
+            Vector3 movementVector = MoveVector();
+            if (movementVector != Vector3.zero) {
+                // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
+                controller.Move(movementVector * Time.deltaTime);
+            }
+        }
+
+        private Vector3 MoveVector() {
             gravityManager.UpdateFallingCheck(player);
 
             Vector3 movementVector = firstPersonTwoDimensionalMovement.Value(player);

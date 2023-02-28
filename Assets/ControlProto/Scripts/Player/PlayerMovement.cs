@@ -42,7 +42,7 @@ namespace ControlProto.Scripts.Player {
             GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
-            firstPersonController = new FirstPersonController(inputSystem, controller, virtualCamera, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
+            firstPersonController = new FirstPersonController(inputSystem, controller, virtualCamera.transform, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
         }
 
         private void Update() {
