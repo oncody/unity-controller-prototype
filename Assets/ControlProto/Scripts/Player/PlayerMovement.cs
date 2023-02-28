@@ -1,5 +1,11 @@
 using Cinemachine;
 using ControlProto.Util;
+using ControlProto.Util.Gravity;
+using ControlProto.Util.PlayerInputSystem;
+using ControlProto.Util.PlayerInputSystem.New;
+using ControlProto.Util.PlayerRotation;
+using ControlProto.Util.ThreeDimensionalMovement;
+using ControlProto.Util.TwoDimensionalGroundPlaneMovement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,26 +19,49 @@ namespace ControlProto.Scripts.Player {
         [SerializeField] private float gravity;
         [SerializeField] private float floatTolerance;
         [SerializeField] private float defaultVerticalVelocity;
-        [SerializeField] private float cameralOffsetFromPlayerCeiling;
+        [SerializeField] private float cameraOffsetFromPlayerCeiling;
 
-        private CursorManager cursorManager;
-        private CharacterControllerMover characterControllerMover;
+        private const float MinPitch = -90;
+        private const float MaxPitch = 90;
+
+        private CharacterController controller;
         private DefaultInputActions defaultInputActions;
-        private RotationManager rotationManager;
+        private CameraRotator cameraRotator;
+        private CharacterRotator characterRotator;
+        private ThreeDimensionalMovement threeDimensionalMovement;
 
         private void Awake() {
-            CharacterController controller = CreateController();
-            Transform camera = CreateCamera(controller);
             defaultInputActions = new DefaultInputActions();
-            defaultInputActions.Enable();
-            cursorManager = new CursorManager();
-            characterControllerMover = new CharacterControllerMover(controller, defaultInputActions, transform, crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed, gravity, floatTolerance, defaultVerticalVelocity);
-            rotationManager = new RotationManager(transform, camera, defaultInputActions, horizontalMouseSensitivity, verticalMouseSensitivity);
+            IPlayerInputSystem inputSystem = new NewPlayerInputSystem(defaultInputActions);
+
+            controller = CreateController();
+            Transform camera = CreateCamera(controller);
+
+            CursorManager cursorManager = new CursorManager();
+            PitchBounds pitchBounds = new PitchBounds(MinPitch, MaxPitch);
+            MouseSensitivities mouseSensitivities = new MouseSensitivities(horizontalMouseSensitivity, verticalMouseSensitivity);
+            Speeds speeds = new Speeds(crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed);
+            GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
+            SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
+            GravityManager gravityManager = new GravityManager(gravityConstants, transform);
+            cameraRotator = new CameraRotator(inputSystem, camera, mouseSensitivities, pitchBounds);
+            characterRotator = new CharacterRotator(inputSystem, transform, mouseSensitivities);
+            TwoDimensionalMovement twoDimensionalMovement = new TwoDimensionalMovement(inputSystem, speedManager);
+            threeDimensionalMovement = new ThreeDimensionalMovement(twoDimensionalMovement, gravityManager);
         }
 
         private void Update() {
-            characterControllerMover.MovePlayer(transform);
-            rotationManager.PerformRotations();
+            cameraRotator.Rotate();
+            characterRotator.Rotate();
+            MovePlayer();
+        }
+
+        public void MovePlayer() {
+            Vector3 movementVector = threeDimensionalMovement.Value(transform);
+            if (movementVector != Vector3.zero) {
+                // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
+                controller.Move(movementVector * Time.deltaTime);
+            }
         }
 
         private CharacterController CreateController() {
@@ -46,7 +75,7 @@ namespace ControlProto.Scripts.Player {
             GameObject cameraObject = new GameObject("CinemachineVirtualCamera");
             Transform camera = cameraObject.transform;
             camera.SetParent(transform);
-            camera.localPosition = new Vector3(0, (controller.height / 2) - cameralOffsetFromPlayerCeiling, 0);
+            camera.localPosition = new Vector3(0, (controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
             CinemachineVirtualCamera cinemachineCameraComponent = cameraObject.AddComponent<CinemachineVirtualCamera>();
 
             GameObject cameraBrainObject = new GameObject("CameraBrain");
