@@ -4,7 +4,6 @@ using UnityEngine;
 namespace ControlProto.Util.PlayerRotation {
     public class CameraRotation {
         private readonly IPlayerInputSystem inputSystem;
-        private readonly Transform camera;
         private readonly MouseSensitivities mouseSensitivities;
         private readonly PitchBounds pitchBounds;
 
@@ -13,18 +12,17 @@ namespace ControlProto.Util.PlayerRotation {
         /**
          * This camera needs to be the physical main camera. Not the Virtual Cinemachine camera
          */
-        public CameraRotation(IPlayerInputSystem inputSystem, Transform camera, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
+        public CameraRotation(IPlayerInputSystem inputSystem, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
             this.inputSystem = inputSystem;
-            this.camera = camera;
             this.mouseSensitivities = mouseSensitivities;
             this.pitchBounds = pitchBounds;
         }
 
-        public void Rotate() {
+        public Quaternion Value() {
             float verticalInput = inputSystem.LookInput().Value().y;
             pitch -= verticalInput * mouseSensitivities.Vertical;
             pitch = Mathf.Clamp(pitch, pitchBounds.Min, pitchBounds.Max);
-            camera.localRotation = Quaternion.Euler(pitch, 0, 0);
+            return Quaternion.Euler(pitch, 0, 0);
         }
     }
 }
