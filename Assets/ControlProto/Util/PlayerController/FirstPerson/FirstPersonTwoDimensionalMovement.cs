@@ -1,12 +1,13 @@
 ﻿using ControlProto.Util.PlayerInputSystem;
+using ControlProto.Util.TwoDimensionalGroundPlaneMovement;
 using UnityEngine;
 
-namespace ControlProto.Util.TwoDimensionalGroundPlaneMovement {
-    public class TwoDimensionalMovement {
+namespace ControlProto.Util.PlayerController.FirstPerson {
+    public class FirstPersonTwoDimensionalMovement {
         private readonly IPlayerInputSystem inputSystem;
         private readonly SpeedManager speedManager;
 
-        public TwoDimensionalMovement(IPlayerInputSystem inputSystem, SpeedManager speedManager) {
+        public FirstPersonTwoDimensionalMovement(IPlayerInputSystem inputSystem, SpeedManager speedManager) {
             this.inputSystem = inputSystem;
             this.speedManager = speedManager;
         }

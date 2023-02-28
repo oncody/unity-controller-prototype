@@ -1,8 +1,9 @@
 ﻿using ControlProto.Util.PlayerInputSystem;
+using ControlProto.Util.PlayerRotation;
 using UnityEngine;
 
-namespace ControlProto.Util.PlayerRotation {
-    public class CameraRotation {
+namespace ControlProto.Util.PlayerController.FirstPerson {
+    public class FirstPersonCameraRotation {
         private readonly IPlayerInputSystem inputSystem;
         private readonly MouseSensitivities mouseSensitivities;
         private readonly PitchBounds pitchBounds;
@@ -12,7 +13,7 @@ namespace ControlProto.Util.PlayerRotation {
         /**
          * This camera needs to be the physical main camera. Not the Virtual Cinemachine camera
          */
-        public CameraRotation(IPlayerInputSystem inputSystem, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
+        public FirstPersonCameraRotation(IPlayerInputSystem inputSystem, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
             this.inputSystem = inputSystem;
             this.mouseSensitivities = mouseSensitivities;
             this.pitchBounds = pitchBounds;

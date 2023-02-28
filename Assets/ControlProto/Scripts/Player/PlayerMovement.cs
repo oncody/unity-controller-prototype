@@ -1,10 +1,10 @@
 using Cinemachine;
 using ControlProto.Util;
 using ControlProto.Util.Gravity;
+using ControlProto.Util.PlayerController.FirstPerson;
 using ControlProto.Util.PlayerInputSystem;
 using ControlProto.Util.PlayerInputSystem.New;
 using ControlProto.Util.PlayerRotation;
-using ControlProto.Util.ThreeDimensionalMovement;
 using ControlProto.Util.TwoDimensionalGroundPlaneMovement;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -24,76 +24,49 @@ namespace ControlProto.Scripts.Player {
         private const float MinPitch = -90;
         private const float MaxPitch = 90;
 
-        private CharacterController controller;
         private DefaultInputActions defaultInputActions;
-        private CameraRotation cameraRotation;
-        private PlayerRotation playerRotation;
-        private ThreeDimensionalMovement threeDimensionalMovement;
-        private Camera playerCamera;
-        private CinemachineBrain cinemachineBrain;
-        private CinemachineVirtualCamera virtualCamera;
+        private FirstPersonController firstPersonController;
 
         private void Awake() {
             defaultInputActions = new DefaultInputActions();
             IPlayerInputSystem inputSystem = new NewPlayerInputSystem(defaultInputActions);
 
-            InitializeController();
-            InitializeCameras();
+            CharacterController controller = InitializeController();
+            CinemachineVirtualCamera virtualCamera = InitializeCameras(controller);
 
             CursorManager cursorManager = new CursorManager();
+
             PitchBounds pitchBounds = new PitchBounds(MinPitch, MaxPitch);
             MouseSensitivities mouseSensitivities = new MouseSensitivities(horizontalMouseSensitivity, verticalMouseSensitivity);
             Speeds speeds = new Speeds(crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed);
             GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
-            cameraRotation = new CameraRotation(inputSystem, mouseSensitivities, pitchBounds);
-            playerRotation = new PlayerRotation(inputSystem, mouseSensitivities);
-            TwoDimensionalMovement twoDimensionalMovement = new TwoDimensionalMovement(inputSystem, speedManager);
-            threeDimensionalMovement = new ThreeDimensionalMovement(twoDimensionalMovement, gravityManager);
+            firstPersonController = new FirstPersonController(inputSystem, controller, virtualCamera, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
         }
 
         private void Update() {
-            RotateCamera();
-            RotatePlayer();
-            MovePlayer();
+            firstPersonController.Update();
         }
 
-        private void RotateCamera() {
-            virtualCamera.transform.localRotation = cameraRotation.Value();
-        }
-
-        private void RotatePlayer() {
-            transform.rotation = playerRotation.Value();
-        }
-
-        private void MovePlayer() {
-            Vector3 movementVector = threeDimensionalMovement.Value(transform);
-            if (movementVector != Vector3.zero) {
-                // Debug.Log($"Moving player from: {transform.position} to: {moveVector}");
-                controller.Move(movementVector * Time.deltaTime);
-            }
-        }
-
-        private void InitializeController() {
+        private CharacterController InitializeController() {
             // Offset the character mesh so that it is slightly above the character controller. This prevents the player from floating above the ground
-            controller = gameObject.AddComponent<CharacterController>();
+            CharacterController controller = gameObject.AddComponent<CharacterController>();
             controller.center += new Vector3(0, controller.skinWidth, 0);
+            return controller;
         }
 
-        /**
-         * Requires a controller to be setup first
-         */
-        private void InitializeCameras() {
+        private CinemachineVirtualCamera InitializeCameras(CharacterController controller) {
             GameObject cameraObject = new GameObject("CinemachineVirtualCamera");
             cameraObject.transform.SetParent(transform);
             cameraObject.transform.localPosition = new Vector3(0, (controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
-            virtualCamera = cameraObject.AddComponent<CinemachineVirtualCamera>();
+            CinemachineVirtualCamera virtualCamera = cameraObject.AddComponent<CinemachineVirtualCamera>();
 
             GameObject cameraBrainObject = new GameObject("CameraBrain");
             cameraBrainObject.transform.SetParent(transform);
-            playerCamera = cameraBrainObject.AddComponent<Camera>();
-            cinemachineBrain = cameraBrainObject.AddComponent<CinemachineBrain>();
+            cameraBrainObject.AddComponent<Camera>();
+            cameraBrainObject.AddComponent<CinemachineBrain>();
+            return virtualCamera;
         }
 
         //
