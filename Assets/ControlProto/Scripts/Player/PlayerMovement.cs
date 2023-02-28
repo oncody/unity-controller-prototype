@@ -26,8 +26,8 @@ namespace ControlProto.Scripts.Player {
 
         private CharacterController controller;
         private DefaultInputActions defaultInputActions;
-        private CameraRotator cameraRotator;
-        private CharacterRotator characterRotator;
+        private CameraRotation cameraRotation;
+        private PlayerRotation playerRotation;
         private ThreeDimensionalMovement threeDimensionalMovement;
 
         private void Awake() {
@@ -44,15 +44,15 @@ namespace ControlProto.Scripts.Player {
             GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
-            cameraRotator = new CameraRotator(inputSystem, camera, mouseSensitivities, pitchBounds);
-            characterRotator = new CharacterRotator(inputSystem, transform, mouseSensitivities);
+            cameraRotation = new CameraRotation(inputSystem, camera, mouseSensitivities, pitchBounds);
+            playerRotation = new PlayerRotation(inputSystem, transform, mouseSensitivities);
             TwoDimensionalMovement twoDimensionalMovement = new TwoDimensionalMovement(inputSystem, speedManager);
             threeDimensionalMovement = new ThreeDimensionalMovement(twoDimensionalMovement, gravityManager);
         }
 
         private void Update() {
-            cameraRotator.Rotate();
-            characterRotator.Rotate();
+            cameraRotation.Rotate();
+            playerRotation.Rotate();
             MovePlayer();
         }
 

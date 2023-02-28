@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace ControlProto.Util.PlayerRotation {
-    public class CameraRotator {
+    public class CameraRotation {
         private readonly IPlayerInputSystem inputSystem;
         private readonly Transform camera;
         private readonly MouseSensitivities mouseSensitivities;
@@ -13,7 +13,7 @@ namespace ControlProto.Util.PlayerRotation {
         /**
          * This camera needs to be the physical main camera. Not the Virtual Cinemachine camera
          */
-        public CameraRotator(IPlayerInputSystem inputSystem, Transform camera, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
+        public CameraRotation(IPlayerInputSystem inputSystem, Transform camera, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
             this.inputSystem = inputSystem;
             this.camera = camera;
             this.mouseSensitivities = mouseSensitivities;
