@@ -69,12 +69,18 @@ namespace ControlProto.Scripts.Player {
             freeLookCamera.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
             freeLookCamera.m_YAxis.m_InvertInput = true;
             freeLookCamera.m_XAxis.m_InvertInput = false;
-            freeLookCamera.m_Orbits[0].m_Height = 14;
-            freeLookCamera.m_Orbits[0].m_Radius = 12;
-            freeLookCamera.m_Orbits[1].m_Height = 5;
-            freeLookCamera.m_Orbits[1].m_Radius = 18;
-            freeLookCamera.m_Orbits[2].m_Height = 1.5f;
-            freeLookCamera.m_Orbits[2].m_Radius = 12;
+
+            // top rig
+            freeLookCamera.m_Orbits[0].m_Height = 5;
+            freeLookCamera.m_Orbits[0].m_Radius = 7;
+
+            // middle rig
+            freeLookCamera.m_Orbits[1].m_Height = 3;
+            freeLookCamera.m_Orbits[1].m_Radius = 5;
+
+            // bottom rig
+            freeLookCamera.m_Orbits[2].m_Height = -1;
+            freeLookCamera.m_Orbits[2].m_Radius = 1;
             return freeLookCamera;
         }
 
