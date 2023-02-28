@@ -31,12 +31,9 @@ namespace ControlProto.Scripts.Player {
         private void Awake() {
             defaultInputActions = new DefaultInputActions();
             IPlayerInputSystem inputSystem = new NewPlayerInputSystem(defaultInputActions);
-
             CharacterController controller = InitializeController();
             CinemachineVirtualCamera virtualCamera = InitializeCameras(controller);
-
             CursorManager cursorManager = new CursorManager();
-
             PitchBounds pitchBounds = new PitchBounds(MinPitch, MaxPitch);
             MouseSensitivities mouseSensitivities = new MouseSensitivities(horizontalMouseSensitivity, verticalMouseSensitivity);
             Speeds speeds = new Speeds(crouchMovementSpeed, walkMovementSpeed, sprintMovementSpeed);
