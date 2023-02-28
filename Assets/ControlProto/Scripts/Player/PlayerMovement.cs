@@ -34,7 +34,8 @@ namespace ControlProto.Scripts.Player {
             defaultInputActions = new DefaultInputActions();
             IPlayerInputSystem inputSystem = new NewPlayerInputSystem(defaultInputActions);
             CharacterController controller = InitializeController();
-            CinemachineVirtualCamera virtualCamera = InitializeCameras(controller);
+            CinemachineFreeLook virtualCamera = InitializeFreeLookCamera(controller);
+            Camera sceneCamera = InitializePlayerCamera();
             CursorManager cursorManager = new CursorManager();
             PitchBounds pitchBounds = new PitchBounds(MinPitch, MaxPitch);
             MouseSensitivities mouseSensitivities = new MouseSensitivities(horizontalMouseSensitivity, verticalMouseSensitivity);
@@ -42,8 +43,8 @@ namespace ControlProto.Scripts.Player {
             GravityConstants gravityConstants = new GravityConstants(gravity, defaultVerticalVelocity, floatTolerance);
             SpeedManager speedManager = new SpeedManager(inputSystem, speeds);
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
-            firstPersonController = new FirstPersonController(inputSystem, controller, virtualCamera.transform, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
-            thirdPersonController = new ThirdPersonController(inputSystem, controller, virtualCamera.transform, transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
+            firstPersonController = new FirstPersonController(inputSystem, controller, transform, virtualCamera.transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
+            thirdPersonController = new ThirdPersonController(inputSystem, controller, transform, virtualCamera.transform, sceneCamera.transform, gravityManager, speedManager, mouseSensitivities, pitchBounds);
         }
 
         private void Update() {
@@ -58,17 +59,30 @@ namespace ControlProto.Scripts.Player {
             return controller;
         }
 
-        private CinemachineVirtualCamera InitializeCameras(CharacterController controller) {
-            GameObject cameraObject = new GameObject("CinemachineVirtualCamera");
+        private CinemachineFreeLook InitializeFreeLookCamera(CharacterController controller) {
+            GameObject cameraObject = new GameObject("ThirdPersonCamera");
             cameraObject.transform.SetParent(transform);
             cameraObject.transform.localPosition = new Vector3(0, (controller.height / 2) - cameraOffsetFromPlayerCeiling, 0);
-            CinemachineVirtualCamera virtualCamera = cameraObject.AddComponent<CinemachineVirtualCamera>();
+            CinemachineFreeLook freeLookCamera = cameraObject.AddComponent<CinemachineFreeLook>();
+            freeLookCamera.m_Follow = transform;
+            freeLookCamera.m_LookAt = transform;
+            freeLookCamera.m_BindingMode = CinemachineTransposer.BindingMode.WorldSpace;
+            freeLookCamera.m_YAxis.m_InvertInput = true;
+            freeLookCamera.m_XAxis.m_InvertInput = false;
+            freeLookCamera.m_Orbits[0].m_Height = 14;
+            freeLookCamera.m_Orbits[0].m_Radius = 12;
+            freeLookCamera.m_Orbits[1].m_Height = 5;
+            freeLookCamera.m_Orbits[1].m_Radius = 18;
+            freeLookCamera.m_Orbits[2].m_Height = 1.5f;
+            freeLookCamera.m_Orbits[2].m_Radius = 12;
+            return freeLookCamera;
+        }
 
+        private Camera InitializePlayerCamera() {
             GameObject cameraBrainObject = new GameObject("CameraBrain");
             cameraBrainObject.transform.SetParent(transform);
-            cameraBrainObject.AddComponent<Camera>();
             cameraBrainObject.AddComponent<CinemachineBrain>();
-            return virtualCamera;
+            return cameraBrainObject.AddComponent<Camera>();
         }
 
         // private CinemachineVirtualCamera InitializeCameras(CharacterController controller) {

@@ -24,9 +24,9 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
         }
 
         private Vector3 MoveVector() {
-            gravityManager.UpdateFallingCheck(player);
+            gravityManager.UpdateFallingCheck();
 
-            Vector3 movementVector = thirdPersonTwoDimensionalMovement.Value(player);
+            Vector3 movementVector = thirdPersonTwoDimensionalMovement.Value();
             float verticalMoveValue = gravityManager.CalculateVerticalMovement();
 
             // if we have horizontal movement, then we might move them off a ledge close to the ground. add a small amount of gravity to pull them down in case.

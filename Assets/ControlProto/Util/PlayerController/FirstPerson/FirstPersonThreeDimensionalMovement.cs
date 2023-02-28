@@ -24,7 +24,7 @@ namespace ControlProto.Util.PlayerController.FirstPerson {
         }
 
         private Vector3 MoveVector() {
-            gravityManager.UpdateFallingCheck(player);
+            gravityManager.UpdateFallingCheck();
 
             Vector3 movementVector = firstPersonTwoDimensionalMovement.Value(player);
             float verticalMoveValue = gravityManager.CalculateVerticalMovement();

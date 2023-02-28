@@ -5,15 +5,17 @@ using UnityEngine;
 namespace ControlProto.Util.PlayerController.ThirdPerson {
     public class ThirdPersonCameraRotation : ICameraRotation {
         private readonly IPlayerInputSystem inputSystem;
-        private readonly Transform camera;
+        private readonly Transform virtualCamera;
+        private readonly Transform sceneCamera;
         private readonly MouseSensitivities mouseSensitivities;
         private readonly PitchBounds pitchBounds;
 
         private float pitch; // up-down rotation around x-axis
 
-        public ThirdPersonCameraRotation(IPlayerInputSystem inputSystem, Transform camera, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
+        public ThirdPersonCameraRotation(IPlayerInputSystem inputSystem, Transform virtualCamera, Transform sceneCamera, MouseSensitivities mouseSensitivities, PitchBounds pitchBounds) {
             this.inputSystem = inputSystem;
-            this.camera = camera;
+            this.virtualCamera = virtualCamera;
+            this.sceneCamera = sceneCamera;
             this.mouseSensitivities = mouseSensitivities;
             this.pitchBounds = pitchBounds;
         }
@@ -22,7 +24,7 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
             float verticalInput = inputSystem.LookInput().Value().y;
             pitch -= verticalInput * mouseSensitivities.Vertical;
             pitch = Mathf.Clamp(pitch, pitchBounds.Min, pitchBounds.Max);
-            camera.localRotation = Quaternion.Euler(pitch, 0, 0);
+            // camera.localRotation = Quaternion.Euler(pitch, 0, 0);
         }
     }
 }

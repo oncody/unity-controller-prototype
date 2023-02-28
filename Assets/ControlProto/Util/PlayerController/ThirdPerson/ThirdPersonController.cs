@@ -13,15 +13,16 @@ namespace ControlProto.Util.PlayerController.ThirdPerson {
         public ThirdPersonController(
             IPlayerInputSystem inputSystem,
             CharacterController controller,
-            Transform camera,
             Transform player,
+            Transform virtualCamera,
+            Transform sceneCamera,
             GravityManager gravityManager,
             SpeedManager speedManager,
             MouseSensitivities mouseSensitivities,
             PitchBounds pitchBounds) {
-            cameraRotation = new ThirdPersonCameraRotation(inputSystem, camera, mouseSensitivities, pitchBounds);
-            playerRotation = new ThirdPersonPlayerRotation(inputSystem, player, mouseSensitivities);
-            ThirdPersonTwoDimensionalMovement thirdPersonTwoDimensionalMovement = new ThirdPersonTwoDimensionalMovement(inputSystem, speedManager);
+            cameraRotation = new ThirdPersonCameraRotation(inputSystem, virtualCamera, sceneCamera, mouseSensitivities, pitchBounds);
+            playerRotation = new ThirdPersonPlayerRotation(inputSystem, player, virtualCamera, sceneCamera, mouseSensitivities);
+            ThirdPersonTwoDimensionalMovement thirdPersonTwoDimensionalMovement = new ThirdPersonTwoDimensionalMovement(inputSystem, player, virtualCamera, sceneCamera, speedManager);
             playerMovement = new ThirdPersonThreeDimensionalMovement(controller, player, thirdPersonTwoDimensionalMovement, gravityManager);
         }
 

@@ -3,18 +3,20 @@
 namespace ControlProto.Util.Gravity {
     public class GravityManager {
         public GravityConstants GravityConstants { get; }
+        private readonly Transform player;
         private float lastYPosition;
         private float velocity;
         private bool fallStarted;
         private bool fallFinished = true;
 
-        public GravityManager(GravityConstants gravityConstants, Transform playerStartingPosition) {
+        public GravityManager(GravityConstants gravityConstants, Transform player) {
             GravityConstants = gravityConstants;
+            this.player = player;
             velocity = gravityConstants.DefaultVerticalVelocity;
-            lastYPosition = playerStartingPosition.position.y;
+            lastYPosition = player.position.y;
         }
 
-        public void UpdateFallingCheck(Transform player) {
+        public void UpdateFallingCheck() {
             float currentYPosition = player.position.y;
             bool isFallingVertically = (Mathf.Abs(currentYPosition - lastYPosition) > GravityConstants.FloatTolerance) && (currentYPosition < lastYPosition);
             if (isFallingVertically && !fallStarted) {

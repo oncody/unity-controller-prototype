@@ -14,8 +14,8 @@ namespace ControlProto.Util.PlayerController.FirstPerson {
         public FirstPersonController(
             IPlayerInputSystem inputSystem,
             CharacterController controller,
-            Transform camera,
             Transform player,
+            Transform camera,
             GravityManager gravityManager,
             SpeedManager speedManager,
             MouseSensitivities mouseSensitivities,
