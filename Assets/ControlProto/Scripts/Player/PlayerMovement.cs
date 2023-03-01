@@ -45,6 +45,9 @@ namespace ControlProto.Scripts.Player {
             GravityManager gravityManager = new GravityManager(gravityConstants, transform);
             // firstPersonController = new FirstPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants, cameraOffsetFromPlayerCeiling);
             thirdPersonController = new ThirdPersonController(inputSystem, playerObjects, gravityManager, speedManager, lookConstants);
+
+            // disabling rigid body physics as we are using a character controller
+            Physics.autoSimulation = false;
         }
 
         private void Update() {
