@@ -19,7 +19,8 @@ namespace ControlProto.Util.PlayerInputSystem.New {
         }
 
         private void InitializeLookInput() {
-            defaultInputActions.Player.Look.performed += context => lookInput = context.ReadValue<Vector2>();
+            defaultInputActions.Player.Look.performed += context => { lookInput = context.ReadValue<Vector2>(); };
+
             defaultInputActions.Player.Look.canceled += _ => lookInput = Vector2.zero;
         }
 
